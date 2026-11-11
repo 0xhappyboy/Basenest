@@ -4,14 +4,15 @@ package com.basenest.core.dao.dos;
  * @ClassName TestDO
  * @Description
  * @Author happyboy
- * @Date 2025/12/9 11:01
+ * @Date 2026/11/11
  * @Version 1.0
  */
 public class TestDO {
     private Long id;
     private String t1;
 
-    public TestDO() {}
+    public TestDO() {
+    }
 
     public TestDO(String t1) {
         this.t1 = t1;

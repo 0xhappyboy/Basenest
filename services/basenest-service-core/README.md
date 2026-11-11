@@ -1,2 +1,2 @@
-# service4j-scaffold
-java api service scaffold
+# basenest-core-service
+Basenest Core Services, provides core services for the entire system.

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * @ClassName UserLlmIntegralDO
  * @Description User LLM integral table DO
  * @Author happyboy
- * @Date 2025/12/9 11:01
+ * @Date 2026/11/11
  * @Version 1.0
  */
 @Data
