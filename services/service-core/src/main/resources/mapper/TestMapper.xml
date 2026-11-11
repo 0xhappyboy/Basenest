@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.dao.mapper.TestMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.TestDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="t1" property="t1" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="insert"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO Test (t1)
+        VALUES (#{testDO.t1})
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT id, t1
+        FROM Test
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT id, t1
+        FROM Test
+        ORDER BY id DESC
+    </select>
+
+    <update id="update">
+        UPDATE Test
+        SET t1 = #{testDO.t1}
+        WHERE id = #{testDO.id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM Test
+        WHERE id = #{id}
+    </delete>
+
+    <select id="searchByT1" resultMap="BaseResultMap">
+        SELECT id, t1
+        FROM Test
+        WHERE t1 LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+</mapper>
