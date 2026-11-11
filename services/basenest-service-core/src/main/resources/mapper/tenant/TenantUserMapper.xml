@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.tenant.TenantUserMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.tenant.TenantUserDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="tenant_id" property="tenantId" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="is_owner" property="isOwner" jdbcType="TINYINT"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="tenantUserDO.id">
+        INSERT INTO t_tenant_user (tenant_id, user_id, is_owner, status)
+        VALUES (#{tenantUserDO.tenantId}, #{tenantUserDO.userId}, #{tenantUserDO.isOwner}, #{tenantUserDO.status})
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_tenant_user WHERE id = #{id}
+    </select>
+
+    <select id="selectByTenantAndUser" resultMap="BaseResultMap">
+        SELECT * FROM t_tenant_user WHERE tenant_id = #{tenantId} AND user_id = #{userId}
+    </select>
+
+    <select id="selectByTenantId" resultMap="BaseResultMap">
+        SELECT * FROM t_tenant_user WHERE tenant_id = #{tenantId} ORDER BY id DESC
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM t_tenant_user WHERE user_id = #{userId} ORDER BY id DESC
+    </select>
+
+    <update id="update">
+        UPDATE t_tenant_user
+        SET is_owner = #{tenantUserDO.isOwner}, status = #{tenantUserDO.status}
+        WHERE id = #{tenantUserDO.id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM t_tenant_user WHERE id = #{id}
+    </delete>
+</mapper>

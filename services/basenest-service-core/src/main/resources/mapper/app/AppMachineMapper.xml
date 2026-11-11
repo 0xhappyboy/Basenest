@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.app.AppMachineMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.AppMachineDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="app_id" property="appId" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="tenant_id" property="tenantId" jdbcType="BIGINT"/>
+        <result column="machine_key" property="machineKey" jdbcType="VARCHAR"/>
+        <result column="machine_name" property="machineName" jdbcType="VARCHAR"/>
+        <result column="os_name" property="osName" jdbcType="VARCHAR"/>
+        <result column="os_version" property="osVersion" jdbcType="VARCHAR"/>
+        <result column="os_arch" property="osArch" jdbcType="VARCHAR"/>
+        <result column="kernel_version" property="kernelVersion" jdbcType="VARCHAR"/>
+        <result column="cpu_model" property="cpuModel" jdbcType="VARCHAR"/>
+        <result column="cpu_cores" property="cpuCores" jdbcType="INTEGER"/>
+        <result column="cpu_freq_mhz" property="cpuFreqMhz" jdbcType="INTEGER"/>
+        <result column="memory_total" property="memoryTotal" jdbcType="BIGINT"/>
+        <result column="disk_total" property="diskTotal" jdbcType="BIGINT"/>
+        <result column="disk_free" property="diskFree" jdbcType="BIGINT"/>
+        <result column="gpu_model" property="gpuModel" jdbcType="VARCHAR"/>
+        <result column="screen_resolution" property="screenResolution" jdbcType="VARCHAR"/>
+        <result column="screen_scale" property="screenScale" jdbcType="DECIMAL"/>
+        <result column="hostname" property="hostname" jdbcType="VARCHAR"/>
+        <result column="mac_address" property="macAddress" jdbcType="VARCHAR"/>
+        <result column="ip_local" property="ipLocal" jdbcType="VARCHAR"/>
+        <result column="ip_public" property="ipPublic" jdbcType="VARCHAR"/>
+        <result column="timezone" property="timezone" jdbcType="VARCHAR"/>
+        <result column="language" property="language" jdbcType="VARCHAR"/>
+        <result column="app_version" property="appVersion" jdbcType="VARCHAR"/>
+        <result column="runtime_version" property="runtimeVersion" jdbcType="VARCHAR"/>
+        <result column="install_path" property="installPath" jdbcType="VARCHAR"/>
+        <result column="is_virtual" property="isVirtual" jdbcType="TINYINT"/>
+        <result column="extra_json" property="extraJson" jdbcType="VARCHAR"/>
+        <result column="first_seen_time" property="firstSeenTime" jdbcType="TIMESTAMP"/>
+        <result column="last_seen_time" property="lastSeenTime" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="appMachineDO.id">
+        INSERT INTO t_app_machine (
+            app_id, user_id, tenant_id, machine_key, machine_name,
+            os_name, os_version, os_arch, kernel_version,
+            cpu_model, cpu_cores, cpu_freq_mhz, memory_total, disk_total, disk_free,
+            gpu_model, screen_resolution, screen_scale,
+            hostname, mac_address, ip_local, ip_public, timezone, language,
+            app_version, runtime_version, install_path, is_virtual, extra_json,
+            first_seen_time, last_seen_time, status, is_deleted
+        ) VALUES (
+                     #{appMachineDO.appId}, #{appMachineDO.userId}, #{appMachineDO.tenantId},
+                     #{appMachineDO.machineKey}, #{appMachineDO.machineName},
+                     #{appMachineDO.osName}, #{appMachineDO.osVersion}, #{appMachineDO.osArch}, #{appMachineDO.kernelVersion},
+                     #{appMachineDO.cpuModel}, #{appMachineDO.cpuCores}, #{appMachineDO.cpuFreqMhz},
+                     #{appMachineDO.memoryTotal}, #{appMachineDO.diskTotal}, #{appMachineDO.diskFree},
+                     #{appMachineDO.gpuModel}, #{appMachineDO.screenResolution}, #{appMachineDO.screenScale},
+                     #{appMachineDO.hostname}, #{appMachineDO.macAddress}, #{appMachineDO.ipLocal}, #{appMachineDO.ipPublic},
+                     #{appMachineDO.timezone}, #{appMachineDO.language},
+                     #{appMachineDO.appVersion}, #{appMachineDO.runtimeVersion}, #{appMachineDO.installPath},
+                     #{appMachineDO.isVirtual}, #{appMachineDO.extraJson},
+                     #{appMachineDO.firstSeenTime}, #{appMachineDO.lastSeenTime},
+                     #{appMachineDO.status}, #{appMachineDO.isDeleted}
+                 )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_app_machine WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectByAppAndKey" resultMap="BaseResultMap">
+        SELECT * FROM t_app_machine
+        WHERE app_id = #{appId} AND machine_key = #{machineKey} AND is_deleted = 0
+    </select>
+
+    <select id="selectByAppId" resultMap="BaseResultMap">
+        SELECT * FROM t_app_machine WHERE app_id = #{appId} AND is_deleted = 0 ORDER BY last_seen_time DESC
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM t_app_machine WHERE user_id = #{userId} AND is_deleted = 0 ORDER BY last_seen_time DESC
+    </select>
+
+    <update id="update">
+        UPDATE t_app_machine
+        SET user_id = #{appMachineDO.userId},
+            tenant_id = #{appMachineDO.tenantId},
+            machine_name = #{appMachineDO.machineName},
+            os_name = #{appMachineDO.osName},
+            os_version = #{appMachineDO.osVersion},
+            os_arch = #{appMachineDO.osArch},
+            kernel_version = #{appMachineDO.kernelVersion},
+            cpu_model = #{appMachineDO.cpuModel},
+            cpu_cores = #{appMachineDO.cpuCores},
+            cpu_freq_mhz = #{appMachineDO.cpuFreqMhz},
+            memory_total = #{appMachineDO.memoryTotal},
+            disk_total = #{appMachineDO.diskTotal},
+            disk_free = #{appMachineDO.diskFree},
+            gpu_model = #{appMachineDO.gpuModel},
+            screen_resolution = #{appMachineDO.screenResolution},
+            screen_scale = #{appMachineDO.screenScale},
+            hostname = #{appMachineDO.hostname},
+            mac_address = #{appMachineDO.macAddress},
+            ip_local = #{appMachineDO.ipLocal},
+            ip_public = #{appMachineDO.ipPublic},
+            timezone = #{appMachineDO.timezone},
+            language = #{appMachineDO.language},
+            app_version = #{appMachineDO.appVersion},
+            runtime_version = #{appMachineDO.runtimeVersion},
+            install_path = #{appMachineDO.installPath},
+            is_virtual = #{appMachineDO.isVirtual},
+            extra_json = #{appMachineDO.extraJson},
+            first_seen_time = #{appMachineDO.firstSeenTime},
+            last_seen_time = #{appMachineDO.lastSeenTime},
+            status = #{appMachineDO.status}
+        WHERE id = #{appMachineDO.id} AND is_deleted = 0
+    </update>
+
+    <update id="delete">
+        UPDATE t_app_machine SET is_deleted = 1 WHERE id = #{id}
+    </update>
+</mapper>

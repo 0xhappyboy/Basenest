@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.UserLlmUsageMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.UserLlmUsageDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="tenant_id" property="tenantId" jdbcType="BIGINT"/>
+        <result column="kind" property="kind" jdbcType="VARCHAR"/>
+        <result column="provider_code" property="providerCode" jdbcType="VARCHAR"/>
+        <result column="model_id" property="modelId" jdbcType="VARCHAR"/>
+        <result column="tokens" property="tokens" jdbcType="BIGINT"/>
+        <result column="usage_type" property="usageType" jdbcType="VARCHAR"/>
+        <result column="duration_ms" property="durationMs" jdbcType="INTEGER"/>
+        <result column="success" property="success" jdbcType="TINYINT"/>
+        <result column="request_id" property="requestId" jdbcType="VARCHAR"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userLlmUsageDO.id">
+        INSERT INTO t_user_llm_usage (
+            user_id, tenant_id, kind, provider_code, model_id, tokens, usage_type,
+            duration_ms, success, request_id, created_at
+        ) VALUES (
+                     #{userLlmUsageDO.userId}, #{userLlmUsageDO.tenantId}, #{userLlmUsageDO.kind},
+                     #{userLlmUsageDO.providerCode}, #{userLlmUsageDO.modelId}, #{userLlmUsageDO.tokens},
+                     #{userLlmUsageDO.usageType}, #{userLlmUsageDO.durationMs}, #{userLlmUsageDO.success},
+                     #{userLlmUsageDO.requestId}, #{userLlmUsageDO.createdAt}
+                 )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_user_llm_usage WHERE id = #{id}
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM t_user_llm_usage WHERE user_id = #{userId} ORDER BY created_at DESC
+    </select>
+
+    <select id="selectByTenantId" resultMap="BaseResultMap">
+        SELECT * FROM t_user_llm_usage WHERE tenant_id = #{tenantId} ORDER BY created_at DESC
+    </select>
+
+    <delete id="delete">
+        DELETE FROM t_user_llm_usage WHERE id = #{id}
+    </delete>
+</mapper>

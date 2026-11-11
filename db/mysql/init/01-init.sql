@@ -1,8 +1,154 @@
-CREATE DATABASE IF NOT EXISTS `soulcut_saas_core_service` DEFAULT CHARACTER
+CREATE DATABASE IF NOT EXISTS `basenest-service` DEFAULT CHARACTER
 SET
     utf8mb4 DEFAULT COLLATE utf8mb4_general_ci;
 
-USE `soulcut_saas_core_service`;
+USE `basenest-service`;
+
+-- ============================================================
+-- App registry (main)
+-- One row = one logical application. Version / package / download
+-- info lives in t_app_release; runtime machine info lives in
+-- t_app_machine. No foreign keys, consistent with the schema.
+-- ============================================================
+CREATE TABLE
+    IF NOT EXISTS `t_app_info` (
+        `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+        `app_key` VARCHAR(64) NOT NULL COMMENT 'Application unique key, used by clients to identify themselves',
+        `code` VARCHAR(64) NOT NULL COMMENT 'Application unique code, e.g. desktop-pro / mobile-ios',
+        `name` VARCHAR(128) NOT NULL COMMENT 'Application display name',
+        `description` VARCHAR(512) DEFAULT NULL COMMENT 'Application description',
+        `platform` VARCHAR(32) NOT NULL DEFAULT 'unknown' COMMENT 'Platform: windows / macos / linux / ios / android / web / cloud / mini_program / unknown',
+        `app_type` VARCHAR(32) NOT NULL DEFAULT 'desktop' COMMENT 'Type: desktop / mobile / web / cloud / mini_program / service / plugin',
+        `runtime` VARCHAR(32) DEFAULT NULL COMMENT 'Runtime: tauri / electron / native / flutter / react_native / browser / jvm / other',
+        `bundle_id` VARCHAR(128) DEFAULT NULL COMMENT 'Bundle id / package name',
+        `icon_url` VARCHAR(512) DEFAULT NULL COMMENT 'Application icon URL',
+        `base_url` VARCHAR(512) DEFAULT NULL COMMENT 'Base API URL, NULL = default',
+        `callback_url` VARCHAR(512) DEFAULT NULL COMMENT 'Callback / redirect URL',
+        `app_secret` VARCHAR(255) DEFAULT NULL COMMENT 'Client secret (encrypted)',
+        `config_json` JSON DEFAULT NULL COMMENT 'Extra app-specific config',
+        `owner_user_id` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner user id, 0 = platform',
+        `owner_tenant_id` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Owner tenant id, 0 = platform public',
+        `category` VARCHAR(32) DEFAULT NULL COMMENT 'Category, e.g. tool / game / internal',
+        `sort_order` INT NOT NULL DEFAULT 0 COMMENT 'Display sort order',
+        `is_public` TINYINT NOT NULL DEFAULT 0 COMMENT 'Visible to all tenants: 0-no 1-yes',
+        `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'Status: 0-disabled 1-enabled',
+        `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0-no 1-yes',
+        `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
+        `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `uk_app_key` (`app_key`),
+        UNIQUE KEY `uk_code` (`code`),
+        KEY `idx_platform` (`platform`),
+        KEY `idx_app_type` (`app_type`),
+        KEY `idx_owner` (`owner_tenant_id`, `owner_user_id`),
+        KEY `idx_status` (`status`),
+        KEY `idx_is_deleted` (`is_deleted`),
+        KEY `idx_create_time` (`create_time`)
+    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'Application registry (main)';
+
+-- ============================================================
+-- App release
+-- One row = one release/package of an application for a given
+-- platform + arch + channel + version. Holds download link and
+-- package metadata. Version history and multi-platform packages
+-- are all rows here.
+-- ============================================================
+CREATE TABLE
+    IF NOT EXISTS `t_app_release` (
+        `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+        `app_id` BIGINT UNSIGNED NOT NULL COMMENT 'App id (t_app_info.id)',
+        `platform` VARCHAR(32) NOT NULL COMMENT 'Platform: windows / macos / linux / ios / android / web',
+        `arch` VARCHAR(32) DEFAULT NULL COMMENT 'Architecture: x64 / arm64 / x86 / universal, NULL = any',
+        `version` VARCHAR(32) NOT NULL COMMENT 'Version, e.g. 1.4.2',
+        `release_channel` VARCHAR(16) NOT NULL DEFAULT 'stable' COMMENT 'Channel: stable / beta / canary / dev',
+        `min_supported_version` VARCHAR(32) DEFAULT NULL COMMENT 'Minimum client version still allowed',
+        `force_update` TINYINT NOT NULL DEFAULT 0 COMMENT 'Force update to this version: 0-no 1-yes',
+        `package_url` VARCHAR(512) DEFAULT NULL COMMENT 'Download / package URL',
+        `package_hash` VARCHAR(128) DEFAULT NULL COMMENT 'Package checksum (sha256)',
+        `package_size` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Package size in bytes, 0 = unknown',
+        `release_notes` TEXT DEFAULT NULL COMMENT 'Release notes',
+        `is_latest` TINYINT NOT NULL DEFAULT 0 COMMENT 'Is latest for this app+platform+arch+channel',
+        `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'Status: 0-disabled 1-enabled',
+        `release_time` DATETIME DEFAULT NULL COMMENT 'Release time',
+        `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
+        `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `uk_app_platform_arch_version_channel` (
+            `app_id`,
+            `platform`,
+            `arch`,
+            `version`,
+            `release_channel`
+        ),
+        KEY `idx_app_latest` (
+            `app_id`,
+            `platform`,
+            `release_channel`,
+            `is_latest`
+        ),
+        KEY `idx_release_time` (`release_time`),
+        KEY `idx_status` (`status`)
+    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'App release table (version + package + download)';
+
+-- ============================================================
+-- App machine
+-- One row = one machine environment reported by a client, used
+-- to collect user machine info. Linked to app + user + tenant.
+-- `machine_key` is a client-generated stable fingerprint so the
+-- same machine updates the same row instead of inserting new ones.
+-- ============================================================
+CREATE TABLE
+    IF NOT EXISTS `t_app_machine` (
+        `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+        `app_id` BIGINT UNSIGNED NOT NULL COMMENT 'App id (t_app_info.id)',
+        `user_id` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'User id, 0 = anonymous',
+        `tenant_id` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Tenant id, 0 = personal / none',
+        `machine_key` VARCHAR(128) NOT NULL COMMENT 'Client-generated stable machine fingerprint',
+        `machine_name` VARCHAR(128) DEFAULT NULL COMMENT 'Machine / host name',
+        -- ----- OS -----
+        `os_name` VARCHAR(32) DEFAULT NULL COMMENT 'OS name: windows / macos / linux / ios / android',
+        `os_version` VARCHAR(64) DEFAULT NULL COMMENT 'OS version',
+        `os_arch` VARCHAR(32) DEFAULT NULL COMMENT 'OS architecture: x64 / arm64 / x86',
+        `kernel_version` VARCHAR(128) DEFAULT NULL COMMENT 'Kernel version',
+        -- ----- Hardware -----
+        `cpu_model` VARCHAR(128) DEFAULT NULL COMMENT 'CPU model',
+        `cpu_cores` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'CPU logical cores, 0 = unknown',
+        `cpu_freq_mhz` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'CPU frequency MHz, 0 = unknown',
+        `memory_total` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total memory bytes, 0 = unknown',
+        `disk_total` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total disk bytes, 0 = unknown',
+        `disk_free` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Free disk bytes, 0 = unknown',
+        `gpu_model` VARCHAR(128) DEFAULT NULL COMMENT 'GPU model',
+        `screen_resolution` VARCHAR(32) DEFAULT NULL COMMENT 'Screen resolution, e.g. 1920x1080',
+        `screen_scale` DECIMAL(4, 2) DEFAULT NULL COMMENT 'Screen scale factor, e.g. 1.50',
+        -- ----- Network & locale -----
+        `hostname` VARCHAR(128) DEFAULT NULL COMMENT 'Network hostname',
+        `mac_address` VARCHAR(64) DEFAULT NULL COMMENT 'Primary MAC address',
+        `ip_local` VARCHAR(64) DEFAULT NULL COMMENT 'Local IP',
+        `ip_public` VARCHAR(64) DEFAULT NULL COMMENT 'Public IP as seen by server',
+        `timezone` VARCHAR(64) DEFAULT NULL COMMENT 'Timezone, e.g. Asia/Shanghai',
+        `language` VARCHAR(16) DEFAULT NULL COMMENT 'System language, e.g. zh-CN',
+        -- ----- App runtime on this machine -----
+        `app_version` VARCHAR(32) DEFAULT NULL COMMENT 'Installed app version',
+        `runtime_version` VARCHAR(64) DEFAULT NULL COMMENT 'Runtime version, e.g. WebView2 / JRE / Tauri',
+        `install_path` VARCHAR(512) DEFAULT NULL COMMENT 'Install path',
+        `is_virtual` TINYINT NOT NULL DEFAULT 0 COMMENT 'Virtual machine: 0-no 1-yes',
+        -- ----- Extra & audit -----
+        `extra_json` JSON DEFAULT NULL COMMENT 'Extra machine info, free-form JSON',
+        `first_seen_time` DATETIME DEFAULT NULL COMMENT 'First report time',
+        `last_seen_time` DATETIME DEFAULT NULL COMMENT 'Last report time',
+        `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'Status: 0-disabled 1-enabled',
+        `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0-no 1-yes',
+        `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
+        `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `uk_app_machine` (`app_id`, `machine_key`),
+        KEY `idx_user_id` (`user_id`),
+        KEY `idx_tenant_id` (`tenant_id`),
+        KEY `idx_os` (`os_name`, `os_version`),
+        KEY `idx_last_seen_time` (`last_seen_time`),
+        KEY `idx_status` (`status`),
+        KEY `idx_is_deleted` (`is_deleted`)
+    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'App machine environment (per machine report)';
 
 -- ============================================================
 -- User table

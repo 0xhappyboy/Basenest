@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.app.AppInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.AppInfoDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="app_key" property="appKey" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="platform" property="platform" jdbcType="VARCHAR"/>
+        <result column="app_type" property="appType" jdbcType="VARCHAR"/>
+        <result column="runtime" property="runtime" jdbcType="VARCHAR"/>
+        <result column="bundle_id" property="bundleId" jdbcType="VARCHAR"/>
+        <result column="icon_url" property="iconUrl" jdbcType="VARCHAR"/>
+        <result column="base_url" property="baseUrl" jdbcType="VARCHAR"/>
+        <result column="callback_url" property="callbackUrl" jdbcType="VARCHAR"/>
+        <result column="app_secret" property="appSecret" jdbcType="VARCHAR"/>
+        <result column="config_json" property="configJson" jdbcType="VARCHAR"/>
+        <result column="owner_user_id" property="ownerUserId" jdbcType="BIGINT"/>
+        <result column="owner_tenant_id" property="ownerTenantId" jdbcType="BIGINT"/>
+        <result column="category" property="category" jdbcType="VARCHAR"/>
+        <result column="sort_order" property="sortOrder" jdbcType="INTEGER"/>
+        <result column="is_public" property="isPublic" jdbcType="TINYINT"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="appInfoDO.id">
+        INSERT INTO t_app_info (
+            app_key, code, name, description, platform, app_type, runtime,
+            bundle_id, icon_url, base_url, callback_url, app_secret, config_json,
+            owner_user_id, owner_tenant_id, category, sort_order, is_public, status, is_deleted
+        ) VALUES (
+                     #{appInfoDO.appKey}, #{appInfoDO.code}, #{appInfoDO.name}, #{appInfoDO.description},
+                     #{appInfoDO.platform}, #{appInfoDO.appType}, #{appInfoDO.runtime},
+                     #{appInfoDO.bundleId}, #{appInfoDO.iconUrl}, #{appInfoDO.baseUrl}, #{appInfoDO.callbackUrl},
+                     #{appInfoDO.appSecret}, #{appInfoDO.configJson},
+                     #{appInfoDO.ownerUserId}, #{appInfoDO.ownerTenantId}, #{appInfoDO.category},
+                     #{appInfoDO.sortOrder}, #{appInfoDO.isPublic}, #{appInfoDO.status}, #{appInfoDO.isDeleted}
+                 )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_app_info WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectByAppKey" resultMap="BaseResultMap">
+        SELECT * FROM t_app_info WHERE app_key = #{appKey} AND is_deleted = 0
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM t_app_info WHERE is_deleted = 0 ORDER BY sort_order ASC, id DESC
+    </select>
+
+    <update id="update">
+        UPDATE t_app_info
+        SET app_key = #{appInfoDO.appKey},
+            code = #{appInfoDO.code},
+            name = #{appInfoDO.name},
+            description = #{appInfoDO.description},
+            platform = #{appInfoDO.platform},
+            app_type = #{appInfoDO.appType},
+            runtime = #{appInfoDO.runtime},
+            bundle_id = #{appInfoDO.bundleId},
+            icon_url = #{appInfoDO.iconUrl},
+            base_url = #{appInfoDO.baseUrl},
+            callback_url = #{appInfoDO.callbackUrl},
+            app_secret = #{appInfoDO.appSecret},
+            config_json = #{appInfoDO.configJson},
+            owner_user_id = #{appInfoDO.ownerUserId},
+            owner_tenant_id = #{appInfoDO.ownerTenantId},
+            category = #{appInfoDO.category},
+            sort_order = #{appInfoDO.sortOrder},
+            is_public = #{appInfoDO.isPublic},
+            status = #{appInfoDO.status}
+        WHERE id = #{appInfoDO.id} AND is_deleted = 0
+    </update>
+
+    <update id="delete">
+        UPDATE t_app_info SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+    <select id="searchByName" resultMap="BaseResultMap">
+        SELECT * FROM t_app_info
+        WHERE is_deleted = 0 AND (name LIKE CONCAT('%', #{keyword}, '%') OR code LIKE CONCAT('%', #{keyword}, '%'))
+        ORDER BY sort_order ASC, id DESC
+    </select>
+</mapper>

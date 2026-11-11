@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.tenant.TenantInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.tenant.TenantInfoDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="contact" property="contact" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="plan_id" property="planId" jdbcType="BIGINT"/>
+        <result column="expire_time" property="expireTime" jdbcType="TIMESTAMP"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="tenantInfoDO.id">
+        INSERT INTO t_tenant_info (name, code, contact, phone, status, plan_id, expire_time, is_deleted)
+        VALUES (#{tenantInfoDO.name}, #{tenantInfoDO.code}, #{tenantInfoDO.contact}, #{tenantInfoDO.phone},
+                #{tenantInfoDO.status}, #{tenantInfoDO.planId}, #{tenantInfoDO.expireTime}, #{tenantInfoDO.isDeleted})
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_tenant_info WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectByCode" resultMap="BaseResultMap">
+        SELECT * FROM t_tenant_info WHERE code = #{code} AND is_deleted = 0
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM t_tenant_info WHERE is_deleted = 0 ORDER BY id DESC
+    </select>
+
+    <update id="update">
+        UPDATE t_tenant_info
+        SET name = #{tenantInfoDO.name},
+            code = #{tenantInfoDO.code},
+            contact = #{tenantInfoDO.contact},
+            phone = #{tenantInfoDO.phone},
+            status = #{tenantInfoDO.status},
+            plan_id = #{tenantInfoDO.planId},
+            expire_time = #{tenantInfoDO.expireTime}
+        WHERE id = #{tenantInfoDO.id} AND is_deleted = 0
+    </update>
+
+    <update id="delete">
+        UPDATE t_tenant_info SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+    <select id="searchByName" resultMap="BaseResultMap">
+        SELECT * FROM t_tenant_info
+        WHERE is_deleted = 0 AND (name LIKE CONCAT('%', #{keyword}, '%') OR code LIKE CONCAT('%', #{keyword}, '%'))
+        ORDER BY id DESC
+    </select>
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.app.AppReleaseMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.AppReleaseDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="app_id" property="appId" jdbcType="BIGINT"/>
+        <result column="platform" property="platform" jdbcType="VARCHAR"/>
+        <result column="arch" property="arch" jdbcType="VARCHAR"/>
+        <result column="version" property="version" jdbcType="VARCHAR"/>
+        <result column="release_channel" property="releaseChannel" jdbcType="VARCHAR"/>
+        <result column="min_supported_version" property="minSupportedVersion" jdbcType="VARCHAR"/>
+        <result column="force_update" property="forceUpdate" jdbcType="TINYINT"/>
+        <result column="package_url" property="packageUrl" jdbcType="VARCHAR"/>
+        <result column="package_hash" property="packageHash" jdbcType="VARCHAR"/>
+        <result column="package_size" property="packageSize" jdbcType="BIGINT"/>
+        <result column="release_notes" property="releaseNotes" jdbcType="LONGVARCHAR"/>
+        <result column="is_latest" property="isLatest" jdbcType="TINYINT"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="release_time" property="releaseTime" jdbcType="TIMESTAMP"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="appReleaseDO.id">
+        INSERT INTO t_app_release (
+            app_id, platform, arch, version, release_channel, min_supported_version,
+            force_update, package_url, package_hash, package_size, release_notes,
+            is_latest, status, release_time
+        ) VALUES (
+                     #{appReleaseDO.appId}, #{appReleaseDO.platform}, #{appReleaseDO.arch},
+                     #{appReleaseDO.version}, #{appReleaseDO.releaseChannel}, #{appReleaseDO.minSupportedVersion},
+                     #{appReleaseDO.forceUpdate}, #{appReleaseDO.packageUrl}, #{appReleaseDO.packageHash},
+                     #{appReleaseDO.packageSize}, #{appReleaseDO.releaseNotes},
+                     #{appReleaseDO.isLatest}, #{appReleaseDO.status}, #{appReleaseDO.releaseTime}
+                 )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_app_release WHERE id = #{id}
+    </select>
+
+    <select id="selectByAppId" resultMap="BaseResultMap">
+        SELECT * FROM t_app_release WHERE app_id = #{appId} ORDER BY release_time DESC, id DESC
+    </select>
+
+    <select id="selectLatest" resultMap="BaseResultMap">
+        SELECT * FROM t_app_release
+        WHERE app_id = #{appId} AND platform = #{platform}
+          AND release_channel = #{releaseChannel} AND is_latest = 1 AND status = 1
+        ORDER BY id DESC LIMIT 1
+    </select>
+
+    <update id="update">
+        UPDATE t_app_release
+        SET platform = #{appReleaseDO.platform},
+            arch = #{appReleaseDO.arch},
+            version = #{appReleaseDO.version},
+            release_channel = #{appReleaseDO.releaseChannel},
+            min_supported_version = #{appReleaseDO.minSupportedVersion},
+            force_update = #{appReleaseDO.forceUpdate},
+            package_url = #{appReleaseDO.packageUrl},
+            package_hash = #{appReleaseDO.packageHash},
+            package_size = #{appReleaseDO.packageSize},
+            release_notes = #{appReleaseDO.releaseNotes},
+            is_latest = #{appReleaseDO.isLatest},
+            status = #{appReleaseDO.status},
+            release_time = #{appReleaseDO.releaseTime}
+        WHERE id = #{appReleaseDO.id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM t_app_release WHERE id = #{id}
+    </delete>
+
+    <update id="clearLatest">
+        UPDATE t_app_release SET is_latest = 0
+        WHERE app_id = #{appId} AND platform = #{platform}
+          AND (arch = #{arch} OR (#{arch} IS NULL AND arch IS NULL))
+          AND release_channel = #{releaseChannel}
+    </update>
+</mapper>
