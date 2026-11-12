@@ -1,0 +1,189 @@
+"use client";
+import { useI18n } from "../providers/I18nProvider";
+import { Send } from "lucide-react";
+import { DiscordIcon } from "../icons/DiscordIcon";
+import { MediumIcon } from "../icons/MediumIcon";
+import { BlueskyIcon } from "../icons/BlueskyIcon";
+import { GitHubIcon } from "../icons/GitHubIcon";
+import { XIcon } from "../icons/XIcon";
+import { FacebookIcon } from "../icons/FacebookIcon";
+import { YouTubeIcon } from "../icons/YouTubeIcon";
+import HuggingFaceIcon from "../icons/HuggingfaceIcon";
+import { RedditIcon } from "../icons/RedditIcon"; // Import Reddit icon
+export default function Footer() {
+  const { locale } = useI18n();
+  const isCn = locale === "cn";
+  // Menu sections configuration
+  const menuSections = [
+    {
+      title: isCn ? "产品" : "Product",
+      links: [
+        { label: isCn ? "视频编辑" : "Video Editor", href: "#" },
+        { label: isCn ? "3D 沙盒" : "3D Sandbox", href: "#" },
+        { label: isCn ? "代码编辑" : "Code Editor", href: "#" },
+        { label: isCn ? "金融分析" : "Finance", href: "#" },
+      ],
+    },
+    {
+      title: isCn ? "资源" : "Resources",
+      links: [
+        {
+          label: isCn ? "文档" : "Documentation",
+          href: "",
+        },
+        { label: "GitHub", href: "" },
+        { label: "Hugging Face", href: "" },
+        { label: isCn ? "博客" : "Blog", href: "" },
+      ],
+    },
+    {
+      title: isCn ? "社区" : "Community",
+      links: [
+        { label: "Discord", href: "https://discord.gg/R7hrkJRAdE" },
+        { label: "X", href: "" },
+        {
+          label: "Bluesky",
+          href: "",
+        },
+        { label: "Telegram", href: "https://t.me/hippoxAI" },
+        { label: "YouTube", href: "" },
+        {
+          label: "Facebook",
+          href: "",
+        },
+        { label: "Reddit", href: "" }, // Add Reddit link
+      ],
+    },
+    {
+      title: isCn ? "关于" : "About",
+      links: [
+        { label: isCn ? "关于我们" : "About Us", href: "#" },
+        {
+          label: isCn ? "开源协议" : "License",
+          href: "",
+        },
+        { label: isCn ? "隐私政策" : "Privacy", href: "#" },
+        { label: isCn ? "联系方式" : "Contact", href: "#" },
+      ],
+    },
+  ];
+  // All social links - matches Header.tsx exactly
+  const socialLinks = [
+    { icon: XIcon, href: "", label: "X" },
+    {
+      icon: YouTubeIcon,
+      href: "",
+      label: "YouTube",
+    },
+    {
+      icon: HuggingFaceIcon,
+      href: "",
+      label: "Hugging Face",
+    },
+    {
+      icon: FacebookIcon,
+      href: "",
+      label: "Facebook",
+    },
+    { icon: GitHubIcon, href: "", label: "GitHub" },
+    {
+      icon: BlueskyIcon,
+      href: "",
+      label: "Bluesky",
+    },
+    {
+      icon: MediumIcon,
+      href: "",
+      label: "Medium",
+      size: 16,
+    },
+    {
+      icon: DiscordIcon,
+      href: "",
+      label: "Discord",
+      size: 16,
+    },
+    { icon: Send, href: "", label: "Telegram" },
+    {
+      icon: RedditIcon,
+      href: "",
+      label: "Reddit",
+    }, // Add Reddit social link
+  ];
+  return (
+    <footer className="w-full border-t border-border/40 bg-background/30 backdrop-blur-sm">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Menu sections grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 md:gap-8">
+          {menuSections.map((section) => (
+            <div key={section.title}>
+              <h3 className="text-xs font-semibold text-foreground/50 uppercase tracking-wider mb-3">
+                {section.title}
+              </h3>
+              <ul className="space-y-2">
+                {section.links.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-foreground/50 hover:text-foreground/80 transition-colors duration-200"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        {/* Bottom section with social icons and copyright */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-border/20">
+          {/* Social icons - matches Header.tsx order */}
+          <div className="flex items-center gap-3 flex-wrap justify-center">
+            {socialLinks.map((social) => {
+              const Icon = social.icon;
+              return (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-foreground/40 hover:text-foreground/70 transition-colors duration-200"
+                  aria-label={social.label}
+                >
+                  {social.size ? (
+                    <Icon size={social.size} />
+                  ) : (
+                    <Icon className="w-4 h-4" />
+                  )}
+                </a>
+              );
+            })}
+          </div>
+          {/* Copyright info */}
+          <div className="flex flex-col items-center sm:items-end gap-1 text-[10px] text-foreground/35">
+            <div className="flex items-center gap-2">
+              <span className="font-medium tracking-wide">Basenest SaaS Management System</span>
+              <span className="text-foreground/15">·</span>
+              <span>{isCn ? "Basenest Saas 管理系统" : "Basenest SaaS Management System"}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span>© {new Date().getFullYear()}</span>
+              <span>·</span>
+              <a 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground/60 transition-colors"
+              >
+                AGPL-3.0
+              </a>
+              <span>·</span>
+              <span>{isCn ? "开源" : "Open Source"}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
