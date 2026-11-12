@@ -11,7 +11,7 @@
     <groupId>com.basenest</groupId>
     <artifactId>core</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>basenest-core-service</name>
+    <name>basenest-service-core</name>
     <description>Basenest Core Services, provides core services for the entire system.</description>
     <url/>
     <licenses>
