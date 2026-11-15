@@ -1,6 +1,6 @@
 package com.basenest.core.service;
 
-import com.basenest.core.dao.dos.UserInfoDO;
+import com.basenest.core.dao.dos.user.UserInfoDO;
 
 import java.util.List;
 

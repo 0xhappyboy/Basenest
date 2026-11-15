@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.basenest.core.dao.mapper.app.AppReleaseMapper">
 
-    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.AppReleaseDO">
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.app.AppReleaseDO">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="app_id" property="appId" jdbcType="BIGINT"/>
         <result column="platform" property="platform" jdbcType="VARCHAR"/>

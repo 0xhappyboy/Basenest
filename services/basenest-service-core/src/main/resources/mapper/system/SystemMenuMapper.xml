@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.system.SystemMenuMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.system.SystemMenuDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="parent_id" property="parentId" jdbcType="BIGINT"/>
+        <result column="level" property="level" jdbcType="TINYINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="VARCHAR"/>
+        <result column="path" property="path" jdbcType="VARCHAR"/>
+        <result column="component" property="component" jdbcType="VARCHAR"/>
+        <result column="icon" property="icon" jdbcType="VARCHAR"/>
+        <result column="permission" property="permission" jdbcType="VARCHAR"/>
+        <result column="sort_order" property="sortOrder" jdbcType="INTEGER"/>
+        <result column="visible" property="visible" jdbcType="TINYINT"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="systemMenuDO.id">
+        INSERT INTO t_sys_menu (
+            parent_id, level, name, code, type, path, component, icon, permission,
+            sort_order, visible, status, is_deleted
+        ) VALUES (
+                     #{systemMenuDO.parentId}, #{systemMenuDO.level}, #{systemMenuDO.name},
+                     #{systemMenuDO.code}, #{systemMenuDO.type}, #{systemMenuDO.path},
+                     #{systemMenuDO.component}, #{systemMenuDO.icon}, #{systemMenuDO.permission},
+                     #{systemMenuDO.sortOrder}, #{systemMenuDO.visible},
+                     #{systemMenuDO.status}, #{systemMenuDO.isDeleted}
+                 )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_menu WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectByCode" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_menu WHERE code = #{code} AND is_deleted = 0
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_menu WHERE is_deleted = 0 ORDER BY level ASC, sort_order ASC, id ASC
+    </select>
+
+    <select id="selectByParentId" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_menu
+        WHERE parent_id = #{parentId} AND is_deleted = 0
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <select id="selectByPermission" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_menu
+        WHERE permission = #{permission} AND is_deleted = 0
+        ORDER BY level ASC, sort_order ASC, id ASC
+    </select>
+
+    <update id="update">
+        UPDATE t_sys_menu
+        SET parent_id = #{systemMenuDO.parentId},
+            level = #{systemMenuDO.level},
+            name = #{systemMenuDO.name},
+            code = #{systemMenuDO.code},
+            type = #{systemMenuDO.type},
+            path = #{systemMenuDO.path},
+            component = #{systemMenuDO.component},
+            icon = #{systemMenuDO.icon},
+            permission = #{systemMenuDO.permission},
+            sort_order = #{systemMenuDO.sortOrder},
+            visible = #{systemMenuDO.visible},
+            status = #{systemMenuDO.status}
+        WHERE id = #{systemMenuDO.id} AND is_deleted = 0
+    </update>
+
+    <update id="delete">
+        UPDATE t_sys_menu SET is_deleted = 1 WHERE id = #{id}
+    </update>
+</mapper>

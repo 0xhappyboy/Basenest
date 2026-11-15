@@ -1,6 +1,6 @@
 package com.basenest.core.controller.user;
 
-import com.basenest.core.dao.dos.UserLlmIntegralDO;
+import com.basenest.core.dao.dos.user.UserLlmIntegralDO;
 import com.basenest.core.service.IUserLlmIntegralService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

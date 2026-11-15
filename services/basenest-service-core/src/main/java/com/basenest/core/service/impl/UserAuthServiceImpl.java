@@ -1,11 +1,11 @@
 package com.basenest.core.service.impl;
 
-import com.basenest.core.dao.dos.UserInfoDO;
-import com.basenest.core.dao.dos.UserRoleInfoDO;
-import com.basenest.core.dao.dos.UserRoleRelationDO;
-import com.basenest.core.dao.mapper.UserInfoMapper;
-import com.basenest.core.dao.mapper.UserRoleInfoMapper;
-import com.basenest.core.dao.mapper.UserRoleRelationMapper;
+import com.basenest.core.dao.dos.user.UserInfoDO;
+import com.basenest.core.dao.dos.user.UserRoleInfoDO;
+import com.basenest.core.dao.dos.user.UserRoleRelationDO;
+import com.basenest.core.dao.mapper.user.UserInfoMapper;
+import com.basenest.core.dao.mapper.user.UserRoleInfoMapper;
+import com.basenest.core.dao.mapper.user.UserRoleRelationMapper;
 import com.basenest.core.pojo.dto.LoginRequest;
 import com.basenest.core.pojo.dto.RegisterRequest;
 import com.basenest.core.service.IUserAuthService;

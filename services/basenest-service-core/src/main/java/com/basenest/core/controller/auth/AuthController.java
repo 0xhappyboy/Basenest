@@ -1,6 +1,6 @@
 package com.basenest.core.controller.auth;
 
-import com.basenest.core.dao.dos.UserInfoDO;
+import com.basenest.core.dao.dos.user.UserInfoDO;
 import com.basenest.core.pojo.bo.JwtClaims;
 import com.basenest.core.pojo.dto.LoginRequest;
 import com.basenest.core.pojo.dto.RegisterRequest;

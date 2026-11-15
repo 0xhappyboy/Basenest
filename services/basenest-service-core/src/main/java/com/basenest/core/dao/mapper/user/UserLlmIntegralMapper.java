@@ -1,6 +1,6 @@
 package com.basenest.core.dao.mapper;
 
-import com.basenest.core.dao.dos.UserLlmIntegralDO;
+import com.basenest.core.dao.dos.user.UserLlmIntegralDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

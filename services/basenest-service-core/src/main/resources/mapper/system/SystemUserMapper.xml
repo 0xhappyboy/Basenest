@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.system.SystemUserMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.system.SystemUserDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="nickname" property="nickname" jdbcType="VARCHAR"/>
+        <result column="real_name" property="realName" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="avatar" property="avatar" jdbcType="VARCHAR"/>
+        <result column="gender" property="gender" jdbcType="TINYINT"/>
+        <result column="dept" property="dept" jdbcType="VARCHAR"/>
+        <result column="job_title" property="jobTitle" jdbcType="VARCHAR"/>
+        <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP"/>
+        <result column="last_login_ip" property="lastLoginIp" jdbcType="VARCHAR"/>
+        <result column="login_fail_count" property="loginFailCount" jdbcType="INTEGER"/>
+        <result column="locked_until" property="lockedUntil" jdbcType="TIMESTAMP"/>
+        <result column="is_super" property="isSuper" jdbcType="TINYINT"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="systemUserDO.id">
+        INSERT INTO t_sys_user (
+            username, password, nickname, real_name, email, phone, avatar, gender,
+            dept, job_title, is_super, status, is_deleted
+        ) VALUES (
+                     #{systemUserDO.username}, #{systemUserDO.password}, #{systemUserDO.nickname},
+                     #{systemUserDO.realName}, #{systemUserDO.email}, #{systemUserDO.phone},
+                     #{systemUserDO.avatar}, #{systemUserDO.gender},
+                     #{systemUserDO.dept}, #{systemUserDO.jobTitle},
+                     #{systemUserDO.isSuper}, #{systemUserDO.status}, #{systemUserDO.isDeleted}
+                 )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_user WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_user WHERE username = #{username} AND is_deleted = 0
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_user WHERE is_deleted = 0 ORDER BY id ASC
+    </select>
+
+    <select id="search" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_user
+        WHERE is_deleted = 0 AND (
+            username LIKE CONCAT('%', #{keyword}, '%')
+                OR nickname LIKE CONCAT('%', #{keyword}, '%')
+                OR real_name LIKE CONCAT('%', #{keyword}, '%')
+            )
+        ORDER BY id ASC
+    </select>
+
+    <update id="update">
+        UPDATE t_sys_user
+        SET username = #{systemUserDO.username},
+            nickname = #{systemUserDO.nickname},
+            real_name = #{systemUserDO.realName},
+            email = #{systemUserDO.email},
+            phone = #{systemUserDO.phone},
+            avatar = #{systemUserDO.avatar},
+            gender = #{systemUserDO.gender},
+            dept = #{systemUserDO.dept},
+            job_title = #{systemUserDO.jobTitle},
+            is_super = #{systemUserDO.isSuper},
+            status = #{systemUserDO.status}
+        WHERE id = #{systemUserDO.id} AND is_deleted = 0
+    </update>
+
+    <update id="updatePassword">
+        UPDATE t_sys_user SET password = #{password} WHERE id = #{id} AND is_deleted = 0
+    </update>
+
+    <update id="updateLastLogin">
+        UPDATE t_sys_user
+        SET last_login_time = #{time}, last_login_ip = #{ip}, login_fail_count = 0
+        WHERE id = #{id} AND is_deleted = 0
+    </update>
+
+    <update id="delete">
+        UPDATE t_sys_user SET is_deleted = 1 WHERE id = #{id}
+    </update>
+</mapper>

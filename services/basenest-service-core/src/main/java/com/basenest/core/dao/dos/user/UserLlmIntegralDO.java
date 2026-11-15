@@ -1,4 +1,4 @@
-package com.basenest.core.dao.dos;
+package com.basenest.core.dao.dos.user;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

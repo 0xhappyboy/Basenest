@@ -1,7 +1,7 @@
 package com.basenest.core.service.impl;
 
-import com.basenest.core.dao.dos.UserRoleRelationDO;
-import com.basenest.core.dao.mapper.UserRoleRelationMapper;
+import com.basenest.core.dao.dos.user.UserRoleRelationDO;
+import com.basenest.core.dao.mapper.user.UserRoleRelationMapper;
 import com.basenest.core.service.IUserRoleRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

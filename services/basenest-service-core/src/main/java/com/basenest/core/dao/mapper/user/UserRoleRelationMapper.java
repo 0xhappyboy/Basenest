@@ -1,6 +1,6 @@
-package com.basenest.core.dao.mapper;
+package com.basenest.core.dao.mapper.user;
 
-import com.basenest.core.dao.dos.UserRoleRelationDO;
+import com.basenest.core.dao.dos.user.UserRoleRelationDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

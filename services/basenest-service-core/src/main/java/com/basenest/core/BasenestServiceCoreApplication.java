@@ -1,12 +1,17 @@
 package com.basenest.core;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
+/**
+ * @ClassName BasenestServiceCoreApplication
+ * @Description Application bootstrap.
+ * @Author happyboy
+ * @Date 2026/11/16
+ * @Version 1.0
+ */
 @SpringBootApplication
-@MapperScan(" com.basenest.core.dao.mapper")
 @ComponentScan("com.basenest.core")
 public class BasenestServiceCoreApplication {
 

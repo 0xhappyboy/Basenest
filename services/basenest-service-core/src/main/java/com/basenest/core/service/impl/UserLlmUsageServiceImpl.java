@@ -1,7 +1,7 @@
 package com.basenest.core.service.impl;
 
-import com.basenest.core.dao.dos.UserLlmUsageDO;
-import com.basenest.core.dao.mapper.UserLlmUsageMapper;
+import com.basenest.core.dao.dos.user.UserLlmUsageDO;
+import com.basenest.core.dao.mapper.user.UserLlmUsageMapper;
 import com.basenest.core.service.IUserLlmUsageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

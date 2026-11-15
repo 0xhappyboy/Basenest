@@ -1,6 +1,6 @@
 package com.basenest.core.service;
 
-import com.basenest.core.dao.dos.UserMemberDO;
+import com.basenest.core.dao.dos.user.UserMemberDO;
 
 public interface IUserMemberService {
     Long addMember(UserMemberDO userMember);

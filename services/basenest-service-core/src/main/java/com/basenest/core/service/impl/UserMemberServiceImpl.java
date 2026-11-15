@@ -1,7 +1,7 @@
 package com.basenest.core.service.impl;
 
-import com.basenest.core.dao.dos.UserMemberDO;
-import com.basenest.core.dao.mapper.UserMemberMapper;
+import com.basenest.core.dao.dos.user.UserMemberDO;
+import com.basenest.core.dao.mapper.user.UserMemberMapper;
 import com.basenest.core.service.IUserMemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

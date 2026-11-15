@@ -1,6 +1,6 @@
 package com.basenest.core.controller.user;
 
-import com.basenest.core.dao.dos.UserRoleRelationDO;
+import com.basenest.core.dao.dos.user.UserRoleRelationDO;
 import com.basenest.core.service.IUserRoleRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

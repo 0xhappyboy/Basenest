@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.system.SystemUserRoleMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.system.SystemUserRoleDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="role_id" property="roleId" jdbcType="BIGINT"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="systemUserRoleDO.id">
+        INSERT INTO t_sys_user_role (user_id, role_id, status)
+        VALUES (#{systemUserRoleDO.userId}, #{systemUserRoleDO.roleId}, #{systemUserRoleDO.status})
+    </insert>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_user_role WHERE user_id = #{userId} AND status = 1
+    </select>
+
+    <select id="selectByRoleId" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_user_role WHERE role_id = #{roleId} AND status = 1
+    </select>
+
+    <delete id="deleteByUserId">
+        DELETE FROM t_sys_user_role WHERE user_id = #{userId}
+    </delete>
+
+    <delete id="deleteByUserIdAndRoleId">
+        DELETE FROM t_sys_user_role WHERE user_id = #{userId} AND role_id = #{roleId}
+    </delete>
+</mapper>

@@ -1,6 +1,6 @@
 package com.basenest.core.service;
 
-import com.basenest.core.dao.dos.UserLlmIntegralDO;
+import com.basenest.core.dao.dos.user.UserLlmIntegralDO;
 
 public interface IUserLlmIntegralService {
     Long addIntegral(UserLlmIntegralDO integral);

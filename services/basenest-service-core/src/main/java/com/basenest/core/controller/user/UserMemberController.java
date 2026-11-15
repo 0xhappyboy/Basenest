@@ -1,6 +1,6 @@
 package com.basenest.core.controller.user;
 
-import com.basenest.core.dao.dos.UserMemberDO;
+import com.basenest.core.dao.dos.user.UserMemberDO;
 import com.basenest.core.service.IUserMemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

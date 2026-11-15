@@ -1,6 +1,6 @@
 package com.basenest.core.controller.user;
 
-import com.basenest.core.dao.dos.UserInfoDO;
+import com.basenest.core.dao.dos.user.UserInfoDO;
 import com.basenest.core.service.IUserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
