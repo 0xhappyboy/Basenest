@@ -17,6 +17,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/app/info")
+@CrossOrigin(origins = "*")
 public class AppInfoController {
 
     @Autowired

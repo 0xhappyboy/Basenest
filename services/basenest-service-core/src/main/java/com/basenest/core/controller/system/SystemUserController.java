@@ -18,6 +18,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/system/user")
+@CrossOrigin(origins = "*")
 public class SystemUserController {
 
     @Autowired

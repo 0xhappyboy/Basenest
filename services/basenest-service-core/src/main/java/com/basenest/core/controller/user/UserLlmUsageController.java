@@ -17,6 +17,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/user/llmusage")
+@CrossOrigin(origins = "*")
 public class UserLlmUsageController {
 
     @Autowired

@@ -17,6 +17,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/app/machine")
+@CrossOrigin(origins = "*")
 public class AppMachineController {
 
     @Autowired

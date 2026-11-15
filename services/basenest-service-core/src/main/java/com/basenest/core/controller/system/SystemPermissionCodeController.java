@@ -17,6 +17,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/system/permission-code")
+@CrossOrigin(origins = "*")
 public class SystemPermissionCodeController {
 
     @Autowired

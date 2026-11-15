@@ -17,6 +17,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/app/release")
+@CrossOrigin(origins = "*")
 public class AppReleaseController {
 
     @Autowired

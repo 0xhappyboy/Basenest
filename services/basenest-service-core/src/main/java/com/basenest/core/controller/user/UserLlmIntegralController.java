@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/user/llmintegral")
+@CrossOrigin(origins = "*")
 public class UserLlmIntegralController {
 
     @Autowired

@@ -17,6 +17,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/tenant/user")
+@CrossOrigin(origins = "*")
 public class TenantUserController {
 
     @Autowired

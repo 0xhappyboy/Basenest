@@ -3,7 +3,16 @@
 import { useI18n } from "../providers/I18nProvider";
 import { useTheme } from "../providers/ThemeProvider";
 import { useState, useRef, useEffect } from "react";
-import { Moon, Sun, Send, Globe, ChevronDown, QrCode } from "lucide-react";
+import {
+  Moon,
+  Sun,
+  Send,
+  Globe,
+  ChevronDown,
+  QrCode,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from "lucide-react";
 import { DiscordIcon } from "../icons/DiscordIcon";
 import { MediumIcon } from "../icons/MediumIcon";
 import { BlueskyIcon } from "../icons/BlueskyIcon";
@@ -14,14 +23,17 @@ import { XIcon } from "../icons/XIcon";
 import { FacebookIcon } from "../icons/FacebookIcon";
 import { YouTubeIcon } from "../icons/YouTubeIcon";
 import HuggingFaceIcon from "../icons/HuggingfaceIcon";
-import { RedditIcon } from "../icons/RedditIcon"; // Import Reddit icon
-export default function Header() {
+import { RedditIcon } from "../icons/RedditIcon";
+interface HeaderProps {
+  sidebarOpen: boolean;
+  onToggleSidebar: () => void;
+}
+export default function Header({ sidebarOpen, onToggleSidebar }: HeaderProps) {
   const { locale, setLocale } = useI18n();
   const { theme, toggleTheme } = useTheme();
   const isZh = locale === "cn";
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  // Social popup state
   const [showWechatPopup, setShowWechatPopup] = useState(false);
   const [showQQPopup, setShowQQPopup] = useState(false);
   const wechatTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -48,7 +60,6 @@ export default function Header() {
       setShowLangDropdown(false);
     }, 150);
   };
-  // Social link handlers
   const handleGithubClick = () => {
     window.open("/", "_blank");
   };
@@ -73,17 +84,12 @@ export default function Header() {
   const handleTelegramClick = () => {
     window.open("/", "_blank");
   };
-  const handleCargoClick = () => {
-    window.open("/", "_blank");
-  };
   const handleFacebookClick = () => {
     window.open("/", "_blank");
   };
-  // Reddit click handler
   const handleRedditClick = () => {
     window.open("/", "_blank");
   };
-  // WeChat popup handlers
   const handleWechatMouseEnter = () => {
     if (wechatTimeoutRef.current) {
       clearTimeout(wechatTimeoutRef.current);
@@ -96,7 +102,6 @@ export default function Header() {
       setShowWechatPopup(false);
     }, 200);
   };
-  // QQ popup handlers
   const handleQQMouseEnter = () => {
     if (qqTimeoutRef.current) {
       clearTimeout(qqTimeoutRef.current);
@@ -113,6 +118,28 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border">
       <div className="flex items-center justify-between px-6 h-14">
         <div className="flex items-center gap-2">
+          {/* Sidebar collapse / expand button, left of the logo */}
+          <button
+            type="button"
+            onClick={onToggleSidebar}
+            className="p-1.5 rounded-lg border border-border hover:border-muted-foreground transition-colors cursor-pointer"
+            aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            title={
+              sidebarOpen
+                ? isZh
+                  ? "收起侧边栏"
+                  : "Collapse sidebar"
+                : isZh
+                  ? "展开侧边栏"
+                  : "Expand sidebar"
+            }
+          >
+            {sidebarOpen ? (
+              <PanelLeftClose className="w-4 h-4" />
+            ) : (
+              <PanelLeftOpen className="w-4 h-4" />
+            )}
+          </button>
           <div
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => (window.location.href = "/")}
@@ -147,7 +174,6 @@ export default function Header() {
               <YouTubeIcon className="w-4 h-4" />
             </button>
           )}
-          {/* Hugging Face button - visible when width >= 700 */}
           {windowWidth >= 700 && (
             <button
               type="button"
@@ -159,7 +185,6 @@ export default function Header() {
               <HuggingFaceIcon className="w-4 h-4" />
             </button>
           )}
-          {/* Facebook button - visible when width >= 700 */}
           {windowWidth >= 700 && (
             <button
               type="button"
@@ -171,7 +196,6 @@ export default function Header() {
               <FacebookIcon className="w-4 h-4" />
             </button>
           )}
-          {/* Reddit button - visible when width >= 700 */}
           {windowWidth >= 700 && (
             <button
               type="button"

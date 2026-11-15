@@ -17,6 +17,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/system/menu")
+@CrossOrigin(origins = "*")
 public class SystemMenuController {
 
     @Autowired

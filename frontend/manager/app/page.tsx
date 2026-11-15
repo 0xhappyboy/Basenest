@@ -1,21 +1,25 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import Sidebar from "./components/Sidebar";
 import { ArrowUp } from "lucide-react";
-interface Repo {
-  id: number;
-  name: string;
-  stargazers_count: number;
-  forks_count: number;
-  html_url: string;
-}
+import { DEFAULT_MENU_ID, MENU_COMPONENTS } from "./menu/MenuRegistry";
+import {
+  getServerSnapshot,
+  readSnapshot,
+  setActiveId,
+  subscribe,
+} from "./menu/MenuStorage";
 export default function HomePage() {
-  const [selectedRepo, setSelectedRepo] = useState<Repo | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const handleSelectRepo = (repo: Repo) => {
-    setSelectedRepo(repo);
-  };
+  const uiState = useSyncExternalStore(
+    subscribe,
+    readSnapshot,
+    getServerSnapshot,
+  );
+  const activeMenuId = uiState.activeId ?? DEFAULT_MENU_ID;
   useEffect(() => {
     const scrollContainer = document.querySelector(".scrollable-content");
     if (!scrollContainer) return;
@@ -34,18 +38,29 @@ export default function HomePage() {
       });
     }
   };
+  const ActivePanel =
+    MENU_COMPONENTS[activeMenuId] ?? MENU_COMPONENTS[DEFAULT_MENU_ID];
   return (
     <div className="h-screen bg-background text-foreground flex flex-col overflow-hidden">
-      {/* Header - fixed, not scrollable */}
-      <Header />
-      {/* Scrollable content area */}
-      <div className="flex-1 overflow-y-auto scrollable-content">
-        {/* Main content with 150px horizontal padding on both sides */}
-        <div className="px-[50px]"></div>
-        {/* Footer */}
-        <Footer />
+      <Header
+        sidebarOpen={sidebarOpen}
+        onToggleSidebar={() => setSidebarOpen((v) => !v)}
+      />
+      <div className="flex-1 flex overflow-hidden">
+        {sidebarOpen && (
+          <Sidebar activeId={activeMenuId} onSelect={setActiveId} />
+        )}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto scrollable-content">
+            <div className="min-h-full flex flex-col">
+              <div className="flex-1">
+                <ActivePanel />
+              </div>
+            </div>
+          </div>
+          <Footer />
+        </div>
       </div>
-      {/* Scroll to top button */}
       <button
         onClick={scrollToTop}
         className={`
