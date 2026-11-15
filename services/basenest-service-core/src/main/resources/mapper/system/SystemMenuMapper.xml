@@ -10,8 +10,6 @@
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="code" property="code" jdbcType="VARCHAR"/>
         <result column="type" property="type" jdbcType="VARCHAR"/>
-        <result column="path" property="path" jdbcType="VARCHAR"/>
-        <result column="component" property="component" jdbcType="VARCHAR"/>
         <result column="icon" property="icon" jdbcType="VARCHAR"/>
         <result column="permission" property="permission" jdbcType="VARCHAR"/>
         <result column="sort_order" property="sortOrder" jdbcType="INTEGER"/>
@@ -24,12 +22,12 @@
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="systemMenuDO.id">
         INSERT INTO t_sys_menu (
-            parent_id, level, name, code, type, path, component, icon, permission,
+            parent_id, level, name, code, type, icon, permission,
             sort_order, visible, status, is_deleted
         ) VALUES (
                      #{systemMenuDO.parentId}, #{systemMenuDO.level}, #{systemMenuDO.name},
-                     #{systemMenuDO.code}, #{systemMenuDO.type}, #{systemMenuDO.path},
-                     #{systemMenuDO.component}, #{systemMenuDO.icon}, #{systemMenuDO.permission},
+                     #{systemMenuDO.code}, #{systemMenuDO.type}, #{systemMenuDO.icon},
+                     #{systemMenuDO.permission},
                      #{systemMenuDO.sortOrder}, #{systemMenuDO.visible},
                      #{systemMenuDO.status}, #{systemMenuDO.isDeleted}
                  )
@@ -66,8 +64,6 @@
             name = #{systemMenuDO.name},
             code = #{systemMenuDO.code},
             type = #{systemMenuDO.type},
-            path = #{systemMenuDO.path},
-            component = #{systemMenuDO.component},
             icon = #{systemMenuDO.icon},
             permission = #{systemMenuDO.permission},
             sort_order = #{systemMenuDO.sortOrder},

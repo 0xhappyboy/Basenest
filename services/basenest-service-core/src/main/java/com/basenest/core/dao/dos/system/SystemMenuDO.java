@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 
 /**
  * @ClassName SystemMenuDO
- * @Description System menu table DO
+ * @Description System menu table DO.
+ * Path and component are removed: React/Next.js uses file-system
+ * routing and maps menu code to its own page in frontend code.
  * @Author happyboy
  * @Date 2026/11/16
  * @Version 1.0
@@ -25,8 +27,6 @@ public class SystemMenuDO {
     private String name;
     private String code;
     private String type;
-    private String path;
-    private String component;
     private String icon;
     private String permission;
     private Integer sortOrder;
