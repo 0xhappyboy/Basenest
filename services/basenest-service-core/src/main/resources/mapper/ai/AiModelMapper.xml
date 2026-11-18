@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.ai.AiModelMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.ai.AiModelDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="vendor_id" property="vendorId" jdbcType="BIGINT"/>
+        <result column="model_code" property="modelCode" jdbcType="VARCHAR"/>
+        <result column="model_name" property="modelName" jdbcType="VARCHAR"/>
+        <result column="modality" property="modality" jdbcType="VARCHAR"/>
+        <result column="provider_code" property="providerCode" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="sort_order" property="sortOrder" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="aiModelDO.id">
+        INSERT INTO t_sys_ai_model (
+            vendor_id, model_code, model_name, modality, provider_code,
+            description, sort_order, status, is_deleted
+        ) VALUES (
+                     #{aiModelDO.vendorId}, #{aiModelDO.modelCode}, #{aiModelDO.modelName},
+                     #{aiModelDO.modality}, #{aiModelDO.providerCode},
+                     #{aiModelDO.description}, #{aiModelDO.sortOrder},
+                     #{aiModelDO.status}, #{aiModelDO.isDeleted}
+                 )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectByVendorAndModelCode" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model
+        WHERE vendor_id = #{vendorId} AND model_code = #{modelCode} AND is_deleted = 0
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model WHERE is_deleted = 0 ORDER BY sort_order ASC, id DESC
+    </select>
+
+    <select id="selectByVendorId" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model
+        WHERE vendor_id = #{vendorId} AND is_deleted = 0
+        ORDER BY sort_order ASC, id DESC
+    </select>
+
+    <select id="selectByModality" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model
+        WHERE modality = #{modality} AND is_deleted = 0
+        ORDER BY sort_order ASC, id DESC
+    </select>
+
+    <update id="update">
+        UPDATE t_sys_ai_model
+        SET vendor_id = #{aiModelDO.vendorId},
+            model_code = #{aiModelDO.modelCode},
+            model_name = #{aiModelDO.modelName},
+            modality = #{aiModelDO.modality},
+            provider_code = #{aiModelDO.providerCode},
+            description = #{aiModelDO.description},
+            sort_order = #{aiModelDO.sortOrder},
+            status = #{aiModelDO.status}
+        WHERE id = #{aiModelDO.id} AND is_deleted = 0
+    </update>
+
+    <update id="delete">
+        UPDATE t_sys_ai_model SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+    <select id="searchByName" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model
+        WHERE is_deleted = 0 AND (model_name LIKE CONCAT('%', #{keyword}, '%') OR model_code LIKE CONCAT('%', #{keyword}, '%'))
+        ORDER BY sort_order ASC, id DESC
+    </select>
+</mapper>

@@ -186,6 +186,29 @@ CREATE TABLE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'Manager menu table (max 3 levels)';
 
 -- ============================================================
+-- Currency exchange rate table
+-- ============================================================
+CREATE TABLE
+    IF NOT EXISTS `t_sys_currency_exchange_rate` (
+        `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+        `currency_code` VARCHAR(8) NOT NULL COMMENT 'ISO 4217 currency code, e.g. USD / CNY / EUR',
+        `currency_name` VARCHAR(64) NOT NULL COMMENT 'Currency display name',
+        `symbol` VARCHAR(8) DEFAULT NULL COMMENT 'Currency symbol, e.g. $ / ¥ / €',
+        `credit_per_unit` DECIMAL(16, 8) NOT NULL DEFAULT 1.00000000 COMMENT 'Credits per 1 unit of this currency',
+        `effective_from` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Effective start time',
+        `effective_to` DATETIME DEFAULT NULL COMMENT 'Effective end time, NULL = currently active',
+        `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'Status: 0-disabled 1-enabled',
+        `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0-no 1-yes',
+        `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
+        `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `uk_currency_active` (`currency_code`, `effective_from`),
+        KEY `idx_currency_code` (`currency_code`),
+        KEY `idx_status` (`status`),
+        KEY `idx_is_deleted` (`is_deleted`)
+    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'Fiat currency to credit exchange rate table (adjustable)';
+
+-- ============================================================
 -- Initialization data
 -- ============================================================
 -- ------------------------------------------------------------
@@ -193,29 +216,9 @@ CREATE TABLE
 -- Password: Admin@123 (bcrypt hash, replace in production)
 -- ------------------------------------------------------------
 INSERT INTO
-    `t_sys_user` (
-        `id`,
-        `username`,
-        `password`,
-        `nickname`,
-        `real_name`,
-        `email`,
-        `is_super`,
-        `status`,
-        `is_deleted`
-    )
+    `t_sys_user` (`id`, `username`, `password`, `nickname`, `real_name`, `email`, `is_super`, `status`, `is_deleted`)
 VALUES
-    (
-        1,
-        'admin',
-        '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVEFDa',
-        'Admin',
-        'Administrator',
-        'admin@basenest.local',
-        1,
-        1,
-        0
-    ) ON DUPLICATE KEY
+    (1, 'admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVEFDa', 'Admin', 'Administrator', 'admin@basenest.local', 1, 1, 0) ON DUPLICATE KEY
 UPDATE `nickname` =
 VALUES
     (`nickname`);
@@ -227,51 +230,11 @@ VALUES
 -- USER        : normal user (read-only / basic access)
 -- ------------------------------------------------------------
 INSERT INTO
-    `t_sys_role` (
-        `id`,
-        `name`,
-        `code`,
-        `description`,
-        `data_scope`,
-        `is_system`,
-        `sort_order`,
-        `status`,
-        `is_deleted`
-    )
+    `t_sys_role` (`id`, `name`, `code`, `description`, `data_scope`, `is_system`, `sort_order`, `status`, `is_deleted`)
 VALUES
-    (
-        1,
-        'Super Admin',
-        'SUPER_ADMIN',
-        'Super administrator with full control',
-        1,
-        1,
-        1,
-        1,
-        0
-    ),
-    (
-        2,
-        'Admin',
-        'ADMIN',
-        'Administrator for daily operations',
-        2,
-        1,
-        2,
-        1,
-        0
-    ),
-    (
-        3,
-        'User',
-        'USER',
-        'Normal user with read-only access',
-        3,
-        1,
-        3,
-        1,
-        0
-    ) ON DUPLICATE KEY
+    (1, 'Super Admin', 'SUPER_ADMIN', 'Super administrator with full control', 1, 1, 1, 1, 0),
+    (2, 'Admin', 'ADMIN', 'Administrator for daily operations', 2, 1, 2, 1, 0),
+    (3, 'User', 'USER', 'Normal user with read-only access', 3, 1, 3, 1, 0) ON DUPLICATE KEY
 UPDATE `name` =
 VALUES
     (`name`);
@@ -291,249 +254,37 @@ VALUES
 -- Permission code enum (system module)
 -- ------------------------------------------------------------
 INSERT INTO
-    `t_sys_permission_code` (
-        `id`,
-        `code`,
-        `name`,
-        `module`,
-        `type`,
-        `description`,
-        `sort_order`,
-        `status`,
-        `is_deleted`
-    )
+    `t_sys_permission_code` (`id`, `code`, `name`, `module`, `type`, `description`, `sort_order`, `status`, `is_deleted`)
 VALUES
-    (
-        1,
-        'system',
-        'System',
-        'system',
-        'menu',
-        'System management',
-        1,
-        1,
-        0
-    ),
-    (
-        2,
-        'system:user',
-        'User',
-        'system',
-        'menu',
-        'User management',
-        1,
-        1,
-        0
-    ),
-    (
-        3,
-        'system:user:list',
-        'User List',
-        'system',
-        'api',
-        'Query user list',
-        1,
-        1,
-        0
-    ),
-    (
-        4,
-        'system:user:create',
-        'User Create',
-        'system',
-        'api',
-        'Create user',
-        2,
-        1,
-        0
-    ),
-    (
-        5,
-        'system:user:update',
-        'User Update',
-        'system',
-        'api',
-        'Update user',
-        3,
-        1,
-        0
-    ),
-    (
-        6,
-        'system:user:delete',
-        'User Delete',
-        'system',
-        'api',
-        'Delete user',
-        4,
-        1,
-        0
-    ),
-    (
-        7,
-        'system:role',
-        'Role',
-        'system',
-        'menu',
-        'Role management',
-        2,
-        1,
-        0
-    ),
-    (
-        8,
-        'system:role:list',
-        'Role List',
-        'system',
-        'api',
-        'Query role list',
-        1,
-        1,
-        0
-    ),
-    (
-        9,
-        'system:role:create',
-        'Role Create',
-        'system',
-        'api',
-        'Create role',
-        2,
-        1,
-        0
-    ),
-    (
-        10,
-        'system:role:update',
-        'Role Update',
-        'system',
-        'api',
-        'Update role',
-        3,
-        1,
-        0
-    ),
-    (
-        11,
-        'system:role:delete',
-        'Role Delete',
-        'system',
-        'api',
-        'Delete role',
-        4,
-        1,
-        0
-    ),
-    (
-        12,
-        'system:permission',
-        'Permission',
-        'system',
-        'menu',
-        'Permission management',
-        3,
-        1,
-        0
-    ),
-    (
-        13,
-        'system:permission:list',
-        'Permission List',
-        'system',
-        'api',
-        'Query permission list',
-        1,
-        1,
-        0
-    ),
-    (
-        14,
-        'system:permission:create',
-        'Permission Create',
-        'system',
-        'api',
-        'Create permission',
-        2,
-        1,
-        0
-    ),
-    (
-        15,
-        'system:permission:update',
-        'Permission Update',
-        'system',
-        'api',
-        'Update permission',
-        3,
-        1,
-        0
-    ),
-    (
-        16,
-        'system:permission:delete',
-        'Permission Delete',
-        'system',
-        'api',
-        'Delete permission',
-        4,
-        1,
-        0
-    ),
-    (
-        17,
-        'system:menu',
-        'Menu',
-        'system',
-        'menu',
-        'Menu management',
-        4,
-        1,
-        0
-    ),
-    (
-        18,
-        'system:menu:list',
-        'Menu List',
-        'system',
-        'api',
-        'Query menu list',
-        1,
-        1,
-        0
-    ),
-    (
-        19,
-        'system:menu:create',
-        'Menu Create',
-        'system',
-        'api',
-        'Create menu',
-        2,
-        1,
-        0
-    ),
-    (
-        20,
-        'system:menu:update',
-        'Menu Update',
-        'system',
-        'api',
-        'Update menu',
-        3,
-        1,
-        0
-    ),
-    (
-        21,
-        'system:menu:delete',
-        'Menu Delete',
-        'system',
-        'api',
-        'Delete menu',
-        4,
-        1,
-        0
-    ) ON DUPLICATE KEY
+    (1, 'system', 'System', 'system', 'menu', 'System management', 1, 1, 0),
+    (2, 'system:user', 'User', 'system', 'menu', 'User management', 1, 1, 0),
+    (3, 'system:user:list', 'User List', 'system', 'api', 'Query user list', 1, 1, 0),
+    (4, 'system:user:create', 'User Create', 'system', 'api', 'Create user', 2, 1, 0),
+    (5, 'system:user:update', 'User Update', 'system', 'api', 'Update user', 3, 1, 0),
+    (6, 'system:user:delete', 'User Delete', 'system', 'api', 'Delete user', 4, 1, 0),
+    (7, 'system:role', 'Role', 'system', 'menu', 'Role management', 2, 1, 0),
+    (8, 'system:role:list', 'Role List', 'system', 'api', 'Query role list', 1, 1, 0),
+    (9, 'system:role:create', 'Role Create', 'system', 'api', 'Create role', 2, 1, 0),
+    (10, 'system:role:update', 'Role Update', 'system', 'api', 'Update role', 3, 1, 0),
+    (11, 'system:role:delete', 'Role Delete', 'system', 'api', 'Delete role', 4, 1, 0),
+    (12, 'system:permission', 'Permission', 'system', 'menu', 'Permission management', 3, 1, 0),
+    (13, 'system:permission:list', 'Permission List', 'system', 'api', 'Query permission list', 1, 1, 0),
+    (14, 'system:permission:create', 'Permission Create', 'system', 'api', 'Create permission', 2, 1, 0),
+    (15, 'system:permission:update', 'Permission Update', 'system', 'api', 'Update permission', 3, 1, 0),
+    (16, 'system:permission:delete', 'Permission Delete', 'system', 'api', 'Delete permission', 4, 1, 0),
+    (17, 'system:menu', 'Menu', 'system', 'menu', 'Menu management', 4, 1, 0),
+    (18, 'system:menu:list', 'Menu List', 'system', 'api', 'Query menu list', 1, 1, 0),
+    (19, 'system:menu:create', 'Menu Create', 'system', 'api', 'Create menu', 2, 1, 0),
+    (20, 'system:menu:update', 'Menu Update', 'system', 'api', 'Update menu', 3, 1, 0),
+    (21, 'system:menu:delete', 'Menu Delete', 'system', 'api', 'Delete menu', 4, 1, 0),
+    (22, 'system:model', 'Model Management', 'system', 'menu', 'Model and vendor management', 5, 1, 0),
+    (23, 'system:model:list', 'Model List', 'system', 'api', 'Query model list', 1, 1, 0),
+    (24, 'system:model:create', 'Model Create', 'system', 'api', 'Create model', 2, 1, 0),
+    (25, 'system:model:update', 'Model Update', 'system', 'api', 'Update model', 3, 1, 0),
+    (26, 'system:model:delete', 'Model Delete', 'system', 'api', 'Delete model', 4, 1, 0),
+    (27, 'system:billing', 'Billing Management', 'system', 'menu', 'Billing and exchange rate management', 6, 1, 0),
+    (28, 'system:billing:list', 'Billing List', 'system', 'api', 'Query billing list', 1, 1, 0),
+    (29, 'system:billing:update', 'Billing Update', 'system', 'api', 'Update billing and rates', 2, 1, 0) ON DUPLICATE KEY
 UPDATE `name` =
 VALUES
     (`name`);
@@ -569,6 +320,14 @@ VALUES
     (1, 'system:menu:create', 1),
     (1, 'system:menu:update', 1),
     (1, 'system:menu:delete', 1),
+    (1, 'system:model', 1),
+    (1, 'system:model:list', 1),
+    (1, 'system:model:create', 1),
+    (1, 'system:model:update', 1),
+    (1, 'system:model:delete', 1),
+    (1, 'system:billing', 1),
+    (1, 'system:billing:list', 1),
+    (1, 'system:billing:update', 1),
     -- ADMIN: all except delete
     (2, 'system', 1),
     (2, 'system:user', 1),
@@ -587,6 +346,13 @@ VALUES
     (2, 'system:menu:list', 1),
     (2, 'system:menu:create', 1),
     (2, 'system:menu:update', 1),
+    (2, 'system:model', 1),
+    (2, 'system:model:list', 1),
+    (2, 'system:model:create', 1),
+    (2, 'system:model:update', 1),
+    (2, 'system:billing', 1),
+    (2, 'system:billing:list', 1),
+    (2, 'system:billing:update', 1),
     -- USER: list only
     (3, 'system', 1),
     (3, 'system:user', 1),
@@ -596,7 +362,11 @@ VALUES
     (3, 'system:permission', 1),
     (3, 'system:permission:list', 1),
     (3, 'system:menu', 1),
-    (3, 'system:menu:list', 1) ON DUPLICATE KEY
+    (3, 'system:menu:list', 1),
+    (3, 'system:model', 1),
+    (3, 'system:model:list', 1),
+    (3, 'system:billing', 1),
+    (3, 'system:billing:list', 1) ON DUPLICATE KEY
 UPDATE `status` =
 VALUES
     (`status`);
@@ -606,259 +376,31 @@ VALUES
 -- Path and component are not stored; frontend maps code -> page.
 -- ------------------------------------------------------------
 INSERT INTO
-    `t_sys_menu` (
-        `id`,
-        `parent_id`,
-        `level`,
-        `name`,
-        `code`,
-        `type`,
-        `icon`,
-        `permission`,
-        `sort_order`,
-        `visible`,
-        `status`,
-        `is_deleted`
-    )
+    `t_sys_menu` (`id`, `parent_id`, `level`, `name`, `code`, `type`, `icon`, `permission`, `sort_order`, `visible`, `status`, `is_deleted`)
 VALUES
-    (
-        1,
-        0,
-        1,
-        'System',
-        'system',
-        'directory',
-        'SettingOutlined',
-        NULL,
-        1,
-        1,
-        1,
-        0
-    ),
-    (
-        2,
-        1,
-        2,
-        'User',
-        'system:user:list',
-        'menu',
-        'UserOutlined',
-        'system:user:list',
-        1,
-        1,
-        1,
-        0
-    ),
-    (
-        3,
-        1,
-        2,
-        'Role',
-        'system:role:list',
-        'menu',
-        'TeamOutlined',
-        'system:role:list',
-        2,
-        1,
-        1,
-        0
-    ),
-    (
-        4,
-        1,
-        2,
-        'Permission',
-        'system:permission:list',
-        'menu',
-        'SafetyOutlined',
-        'system:permission:list',
-        3,
-        1,
-        1,
-        0
-    ),
-    (
-        5,
-        1,
-        2,
-        'Menu',
-        'system:menu:list',
-        'menu',
-        'MenuOutlined',
-        'system:menu:list',
-        4,
-        1,
-        1,
-        0
-    ),
-    (
-        6,
-        2,
-        3,
-        'User Create',
-        'system:user:create',
-        'button',
-        NULL,
-        'system:user:create',
-        1,
-        1,
-        1,
-        0
-    ),
-    (
-        7,
-        2,
-        3,
-        'User Update',
-        'system:user:update',
-        'button',
-        NULL,
-        'system:user:update',
-        2,
-        1,
-        1,
-        0
-    ),
-    (
-        8,
-        2,
-        3,
-        'User Delete',
-        'system:user:delete',
-        'button',
-        NULL,
-        'system:user:delete',
-        3,
-        1,
-        1,
-        0
-    ),
-    (
-        9,
-        3,
-        3,
-        'Role Create',
-        'system:role:create',
-        'button',
-        NULL,
-        'system:role:create',
-        1,
-        1,
-        1,
-        0
-    ),
-    (
-        10,
-        3,
-        3,
-        'Role Update',
-        'system:role:update',
-        'button',
-        NULL,
-        'system:role:update',
-        2,
-        1,
-        1,
-        0
-    ),
-    (
-        11,
-        3,
-        3,
-        'Role Delete',
-        'system:role:delete',
-        'button',
-        NULL,
-        'system:role:delete',
-        3,
-        1,
-        1,
-        0
-    ),
-    (
-        12,
-        4,
-        3,
-        'Permission Create',
-        'system:permission:create',
-        'button',
-        NULL,
-        'system:permission:create',
-        1,
-        1,
-        1,
-        0
-    ),
-    (
-        13,
-        4,
-        3,
-        'Permission Update',
-        'system:permission:update',
-        'button',
-        NULL,
-        'system:permission:update',
-        2,
-        1,
-        1,
-        0
-    ),
-    (
-        14,
-        4,
-        3,
-        'Permission Delete',
-        'system:permission:delete',
-        'button',
-        NULL,
-        'system:permission:delete',
-        3,
-        1,
-        1,
-        0
-    ),
-    (
-        15,
-        5,
-        3,
-        'Menu Create',
-        'system:menu:create',
-        'button',
-        NULL,
-        'system:menu:create',
-        1,
-        1,
-        1,
-        0
-    ),
-    (
-        16,
-        5,
-        3,
-        'Menu Update',
-        'system:menu:update',
-        'button',
-        NULL,
-        'system:menu:update',
-        2,
-        1,
-        1,
-        0
-    ),
-    (
-        17,
-        5,
-        3,
-        'Menu Delete',
-        'system:menu:delete',
-        'button',
-        NULL,
-        'system:menu:delete',
-        3,
-        1,
-        1,
-        0
-    ) ON DUPLICATE KEY
+    (1, 0, 1, 'System', 'system', 'directory', 'SettingOutlined', NULL, 1, 1, 1, 0),
+    (2, 1, 2, 'User', 'system:user:list', 'menu', 'UserOutlined', 'system:user:list', 1, 1, 1, 0),
+    (3, 1, 2, 'Role', 'system:role:list', 'menu', 'TeamOutlined', 'system:role:list', 2, 1, 1, 0),
+    (4, 1, 2, 'Permission', 'system:permission:list', 'menu', 'SafetyOutlined', 'system:permission:list', 3, 1, 1, 0),
+    (5, 1, 2, 'Menu', 'system:menu:list', 'menu', 'MenuOutlined', 'system:menu:list', 4, 1, 1, 0),
+    (6, 2, 3, 'User Create', 'system:user:create', 'button', NULL, 'system:user:create', 1, 1, 1, 0),
+    (7, 2, 3, 'User Update', 'system:user:update', 'button', NULL, 'system:user:update', 2, 1, 1, 0),
+    (8, 2, 3, 'User Delete', 'system:user:delete', 'button', NULL, 'system:user:delete', 3, 1, 1, 0),
+    (9, 3, 3, 'Role Create', 'system:role:create', 'button', NULL, 'system:role:create', 1, 1, 1, 0),
+    (10, 3, 3, 'Role Update', 'system:role:update', 'button', NULL, 'system:role:update', 2, 1, 1, 0),
+    (11, 3, 3, 'Role Delete', 'system:role:delete', 'button', NULL, 'system:role:delete', 3, 1, 1, 0),
+    (12, 4, 3, 'Permission Create', 'system:permission:create', 'button', NULL, 'system:permission:create', 1, 1, 1, 0),
+    (13, 4, 3, 'Permission Update', 'system:permission:update', 'button', NULL, 'system:permission:update', 2, 1, 1, 0),
+    (14, 4, 3, 'Permission Delete', 'system:permission:delete', 'button', NULL, 'system:permission:delete', 3, 1, 1, 0),
+    (15, 5, 3, 'Menu Create', 'system:menu:create', 'button', NULL, 'system:menu:create', 1, 1, 1, 0),
+    (16, 5, 3, 'Menu Update', 'system:menu:update', 'button', NULL, 'system:menu:update', 2, 1, 1, 0),
+    (17, 5, 3, 'Menu Delete', 'system:menu:delete', 'button', NULL, 'system:menu:delete', 3, 1, 1, 0),
+    (18, 1, 2, 'Model', 'system:model:list', 'menu', 'AppstoreOutlined', 'system:model:list', 5, 1, 1, 0),
+    (19, 1, 2, 'Billing', 'system:billing:list', 'menu', 'DollarOutlined', 'system:billing:list', 6, 1, 1, 0),
+    (20, 18, 3, 'Model Create', 'system:model:create', 'button', NULL, 'system:model:create', 1, 1, 1, 0),
+    (21, 18, 3, 'Model Update', 'system:model:update', 'button', NULL, 'system:model:update', 2, 1, 1, 0),
+    (22, 18, 3, 'Model Delete', 'system:model:delete', 'button', NULL, 'system:model:delete', 3, 1, 1, 0),
+    (23, 19, 3, 'Billing Update', 'system:billing:update', 'button', NULL, 'system:billing:update', 1, 1, 1, 0) ON DUPLICATE KEY
 UPDATE `name` =
 VALUES
     (`name`);

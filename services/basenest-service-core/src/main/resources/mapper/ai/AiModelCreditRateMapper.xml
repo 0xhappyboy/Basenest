@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.ai.AiModelCreditRateMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.ai.AiModelCreditRateDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="model_id" property="modelId" jdbcType="BIGINT"/>
+        <result column="credit_per_unit" property="creditPerUnit" jdbcType="DECIMAL"/>
+        <result column="effective_from" property="effectiveFrom" jdbcType="TIMESTAMP"/>
+        <result column="effective_to" property="effectiveTo" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="aiModelCreditRateDO.id">
+        INSERT INTO t_sys_ai_model_credit_rate (
+            model_id, credit_per_unit, effective_from, effective_to, status, is_deleted
+        ) VALUES (
+                     #{aiModelCreditRateDO.modelId}, #{aiModelCreditRateDO.creditPerUnit},
+                     #{aiModelCreditRateDO.effectiveFrom}, #{aiModelCreditRateDO.effectiveTo},
+                     #{aiModelCreditRateDO.status}, #{aiModelCreditRateDO.isDeleted}
+                 )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model_credit_rate WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectActiveByModelId" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model_credit_rate
+        WHERE model_id = #{modelId} AND is_deleted = 0 AND status = 1
+          AND effective_to IS NULL
+        ORDER BY effective_from DESC
+            LIMIT 1
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model_credit_rate WHERE is_deleted = 0 ORDER BY id DESC
+    </select>
+
+    <select id="selectByModelId" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model_credit_rate
+        WHERE model_id = #{modelId} AND is_deleted = 0
+        ORDER BY effective_from DESC
+    </select>
+
+    <update id="update">
+        UPDATE t_sys_ai_model_credit_rate
+        SET model_id = #{aiModelCreditRateDO.modelId},
+            credit_per_unit = #{aiModelCreditRateDO.creditPerUnit},
+            effective_from = #{aiModelCreditRateDO.effectiveFrom},
+            effective_to = #{aiModelCreditRateDO.effectiveTo},
+            status = #{aiModelCreditRateDO.status}
+        WHERE id = #{aiModelCreditRateDO.id} AND is_deleted = 0
+    </update>
+
+    <update id="delete">
+        UPDATE t_sys_ai_model_credit_rate SET is_deleted = 1 WHERE id = #{id}
+    </update>
+</mapper>

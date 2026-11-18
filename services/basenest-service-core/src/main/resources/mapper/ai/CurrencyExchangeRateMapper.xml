@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.ai.CurrencyExchangeRateMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.ai.CurrencyExchangeRateDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="currency_code" property="currencyCode" jdbcType="VARCHAR"/>
+        <result column="currency_name" property="currencyName" jdbcType="VARCHAR"/>
+        <result column="symbol" property="symbol" jdbcType="VARCHAR"/>
+        <result column="credit_per_unit" property="creditPerUnit" jdbcType="DECIMAL"/>
+        <result column="effective_from" property="effectiveFrom" jdbcType="TIMESTAMP"/>
+        <result column="effective_to" property="effectiveTo" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="currencyExchangeRateDO.id">
+        INSERT INTO t_sys_currency_exchange_rate (
+            currency_code, currency_name, symbol, credit_per_unit,
+            effective_from, effective_to, status, is_deleted
+        ) VALUES (
+                     #{currencyExchangeRateDO.currencyCode}, #{currencyExchangeRateDO.currencyName},
+                     #{currencyExchangeRateDO.symbol}, #{currencyExchangeRateDO.creditPerUnit},
+                     #{currencyExchangeRateDO.effectiveFrom}, #{currencyExchangeRateDO.effectiveTo},
+                     #{currencyExchangeRateDO.status}, #{currencyExchangeRateDO.isDeleted}
+                 )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_currency_exchange_rate WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectActiveByCurrencyCode" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_currency_exchange_rate
+        WHERE currency_code = #{currencyCode} AND is_deleted = 0 AND status = 1
+          AND effective_to IS NULL
+        ORDER BY effective_from DESC
+            LIMIT 1
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_currency_exchange_rate WHERE is_deleted = 0 ORDER BY id ASC
+    </select>
+
+    <update id="update">
+        UPDATE t_sys_currency_exchange_rate
+        SET currency_code = #{currencyExchangeRateDO.currencyCode},
+            currency_name = #{currencyExchangeRateDO.currencyName},
+            symbol = #{currencyExchangeRateDO.symbol},
+            credit_per_unit = #{currencyExchangeRateDO.creditPerUnit},
+            effective_from = #{currencyExchangeRateDO.effectiveFrom},
+            effective_to = #{currencyExchangeRateDO.effectiveTo},
+            status = #{currencyExchangeRateDO.status}
+        WHERE id = #{currencyExchangeRateDO.id} AND is_deleted = 0
+    </update>
+
+    <update id="delete">
+        UPDATE t_sys_currency_exchange_rate SET is_deleted = 1 WHERE id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.user.UserModelCostRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.user.UserModelCostRecordDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="record_no" property="recordNo" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="tenant_id" property="tenantId" jdbcType="BIGINT"/>
+        <result column="vendor_id" property="vendorId" jdbcType="BIGINT"/>
+        <result column="model_id" property="modelId" jdbcType="BIGINT"/>
+        <result column="modality" property="modality" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userModelCostRecordDO.id">
+        INSERT INTO t_user_model_cost_record (
+            record_no, user_id, tenant_id, vendor_id, model_id,
+            modality, status, is_deleted
+        ) VALUES (
+                     #{userModelCostRecordDO.recordNo}, #{userModelCostRecordDO.userId},
+                     #{userModelCostRecordDO.tenantId}, #{userModelCostRecordDO.vendorId},
+                     #{userModelCostRecordDO.modelId}, #{userModelCostRecordDO.modality},
+                     #{userModelCostRecordDO.status}, #{userModelCostRecordDO.isDeleted}
+                 )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_user_model_cost_record WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectByRecordNo" resultMap="BaseResultMap">
+        SELECT * FROM t_user_model_cost_record WHERE record_no = #{recordNo} AND is_deleted = 0
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM t_user_model_cost_record WHERE is_deleted = 0 ORDER BY create_time DESC, id DESC
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT * FROM t_user_model_cost_record
+        WHERE user_id = #{userId} AND is_deleted = 0
+        ORDER BY create_time DESC, id DESC
+    </select>
+
+    <select id="selectByModelId" resultMap="BaseResultMap">
+        SELECT * FROM t_user_model_cost_record
+        WHERE model_id = #{modelId} AND is_deleted = 0
+        ORDER BY create_time DESC, id DESC
+    </select>
+
+    <update id="update">
+        UPDATE t_user_model_cost_record
+        SET record_no = #{userModelCostRecordDO.recordNo},
+            user_id = #{userModelCostRecordDO.userId},
+            tenant_id = #{userModelCostRecordDO.tenantId},
+            vendor_id = #{userModelCostRecordDO.vendorId},
+            model_id = #{userModelCostRecordDO.modelId},
+            modality = #{userModelCostRecordDO.modality},
+            status = #{userModelCostRecordDO.status}
+        WHERE id = #{userModelCostRecordDO.id} AND is_deleted = 0
+    </update>
+
+    <update id="delete">
+        UPDATE t_user_model_cost_record SET is_deleted = 1 WHERE id = #{id}
+    </update>
+</mapper>

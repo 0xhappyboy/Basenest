@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.ai.AiVendorMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.ai.AiVendorDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="vendor_code" property="vendorCode" jdbcType="VARCHAR"/>
+        <result column="name_cn" property="nameCn" jdbcType="VARCHAR"/>
+        <result column="name_en" property="nameEn" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="website" property="website" jdbcType="VARCHAR"/>
+        <result column="sort_order" property="sortOrder" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="aiVendorDO.id">
+        INSERT INTO t_sys_ai_vendor (
+            vendor_code, name_cn, name_en, description, website,
+            sort_order, status, is_deleted
+        ) VALUES (
+                     #{aiVendorDO.vendorCode}, #{aiVendorDO.nameCn}, #{aiVendorDO.nameEn},
+                     #{aiVendorDO.description}, #{aiVendorDO.website},
+                     #{aiVendorDO.sortOrder}, #{aiVendorDO.status}, #{aiVendorDO.isDeleted}
+                 )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_vendor WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectByVendorCode" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_vendor WHERE vendor_code = #{vendorCode} AND is_deleted = 0
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_vendor WHERE is_deleted = 0 ORDER BY sort_order ASC, id DESC
+    </select>
+
+    <update id="update">
+        UPDATE t_sys_ai_vendor
+        SET vendor_code = #{aiVendorDO.vendorCode},
+            name_cn = #{aiVendorDO.nameCn},
+            name_en = #{aiVendorDO.nameEn},
+            description = #{aiVendorDO.description},
+            website = #{aiVendorDO.website},
+            sort_order = #{aiVendorDO.sortOrder},
+            status = #{aiVendorDO.status}
+        WHERE id = #{aiVendorDO.id} AND is_deleted = 0
+    </update>
+
+    <update id="delete">
+        UPDATE t_sys_ai_vendor SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+    <select id="searchByName" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_vendor
+        WHERE is_deleted = 0 AND (name_cn LIKE CONCAT('%', #{keyword}, '%') OR name_en LIKE CONCAT('%', #{keyword}, '%') OR vendor_code LIKE CONCAT('%', #{keyword}, '%'))
+        ORDER BY sort_order ASC, id DESC
+    </select>
+</mapper>

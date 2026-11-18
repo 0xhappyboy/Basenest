@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basenest.core.dao.mapper.ai.AiModelBillingMapper">
+
+    <resultMap id="BaseResultMap" type="com.basenest.core.dao.dos.ai.AiModelBillingDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="vendor_id" property="vendorId" jdbcType="BIGINT"/>
+        <result column="model_id" property="modelId" jdbcType="BIGINT"/>
+        <result column="billing_unit" property="billingUnit" jdbcType="VARCHAR"/>
+        <result column="unit_price_usd" property="unitPriceUsd" jdbcType="DECIMAL"/>
+        <result column="currency" property="currency" jdbcType="VARCHAR"/>
+        <result column="effective_from" property="effectiveFrom" jdbcType="TIMESTAMP"/>
+        <result column="effective_to" property="effectiveTo" jdbcType="TIMESTAMP"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="is_deleted" property="isDeleted" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="aiModelBillingDO.id">
+        INSERT INTO t_sys_ai_model_billing (
+            vendor_id, model_id, billing_unit, unit_price_usd, currency,
+            effective_from, effective_to, status, is_deleted
+        ) VALUES (
+                     #{aiModelBillingDO.vendorId}, #{aiModelBillingDO.modelId},
+                     #{aiModelBillingDO.billingUnit}, #{aiModelBillingDO.unitPriceUsd},
+                     #{aiModelBillingDO.currency}, #{aiModelBillingDO.effectiveFrom},
+                     #{aiModelBillingDO.effectiveTo}, #{aiModelBillingDO.status},
+                     #{aiModelBillingDO.isDeleted}
+                 )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model_billing WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectActiveByModelId" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model_billing
+        WHERE model_id = #{modelId} AND is_deleted = 0 AND status = 1
+          AND effective_to IS NULL
+        ORDER BY effective_from DESC
+            LIMIT 1
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model_billing WHERE is_deleted = 0 ORDER BY id DESC
+    </select>
+
+    <select id="selectByModelId" resultMap="BaseResultMap">
+        SELECT * FROM t_sys_ai_model_billing
+        WHERE model_id = #{modelId} AND is_deleted = 0
+        ORDER BY effective_from DESC
+    </select>
+
+    <update id="update">
+        UPDATE t_sys_ai_model_billing
+        SET vendor_id = #{aiModelBillingDO.vendorId},
+            model_id = #{aiModelBillingDO.modelId},
+            billing_unit = #{aiModelBillingDO.billingUnit},
+            unit_price_usd = #{aiModelBillingDO.unitPriceUsd},
+            currency = #{aiModelBillingDO.currency},
+            effective_from = #{aiModelBillingDO.effectiveFrom},
+            effective_to = #{aiModelBillingDO.effectiveTo},
+            status = #{aiModelBillingDO.status}
+        WHERE id = #{aiModelBillingDO.id} AND is_deleted = 0
+    </update>
+
+    <update id="delete">
+        UPDATE t_sys_ai_model_billing SET is_deleted = 1 WHERE id = #{id}
+    </update>
+</mapper>

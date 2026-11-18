@@ -73,19 +73,8 @@ CREATE TABLE
         `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Create time',
         `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
         PRIMARY KEY (`id`),
-        UNIQUE KEY `uk_app_platform_arch_version_channel` (
-            `app_id`,
-            `platform`,
-            `arch`,
-            `version`,
-            `release_channel`
-        ),
-        KEY `idx_app_latest` (
-            `app_id`,
-            `platform`,
-            `release_channel`,
-            `is_latest`
-        ),
+        UNIQUE KEY `uk_app_platform_arch_version_channel` (`app_id`, `platform`, `arch`, `version`, `release_channel`),
+        KEY `idx_app_latest` (`app_id`, `platform`, `release_channel`, `is_latest`),
         KEY `idx_release_time` (`release_time`),
         KEY `idx_status` (`status`)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'App release table (version + package + download)';
@@ -387,29 +376,9 @@ CREATE TABLE
 -- Default tenant
 -- ------------------------------------------------------------
 INSERT INTO
-    `t_tenant_info` (
-        `id`,
-        `name`,
-        `code`,
-        `contact`,
-        `phone`,
-        `status`,
-        `plan_id`,
-        `expire_time`,
-        `is_deleted`
-    )
+    `t_tenant_info` (`id`, `name`, `code`, `contact`, `phone`, `status`, `plan_id`, `expire_time`, `is_deleted`)
 VALUES
-    (
-        1,
-        'Default Tenant',
-        'default',
-        'admin',
-        '13800000000',
-        1,
-        0,
-        NULL,
-        0
-    ) ON DUPLICATE KEY
+    (1, 'Default Tenant', 'default', 'admin', '13800000000', 1, 0, NULL, 0) ON DUPLICATE KEY
 UPDATE `name` =
 VALUES
     (`name`);
@@ -421,43 +390,59 @@ VALUES
 -- TENANT_USER : normal tenant member
 -- ------------------------------------------------------------
 INSERT INTO
-    `t_user_role_info` (
-        `id`,
-        `tenant_id`,
-        `name`,
-        `code`,
-        `description`,
-        `is_system`,
-        `status`
-    )
+    `t_user_role_info` (`id`, `tenant_id`, `name`, `code`, `description`, `is_system`, `status`)
 VALUES
-    (
-        1,
-        0,
-        'Super Admin',
-        'SUPER_ADMIN',
-        'Platform super administrator',
-        1,
-        1
-    ),
-    (
-        2,
-        0,
-        'Tenant Admin',
-        'TENANT_ADMIN',
-        'Tenant administrator',
-        1,
-        1
-    ),
-    (
-        3,
-        0,
-        'Tenant User',
-        'TENANT_USER',
-        'Normal tenant member',
-        1,
-        1
-    ) ON DUPLICATE KEY
+    (1, 0, 'Super Admin', 'SUPER_ADMIN', 'Platform super administrator', 1, 1),
+    (2, 0, 'Tenant Admin', 'TENANT_ADMIN', 'Tenant administrator', 1, 1),
+    (3, 0, 'Tenant User', 'TENANT_USER', 'Normal tenant member', 1, 1) ON DUPLICATE KEY
 UPDATE `name` =
 VALUES
     (`name`);
+
+-- ============================================================
+-- User model cost record table
+-- One row = one billable model call made by a C-side user
+-- (t_user_info). Only identity + vendor + model + time are
+-- stored here; pricing and credit details are resolved from
+-- the system catalog (vendor / model / billing / credit rate).
+-- No foreign keys, consistent with the rest of the schema.
+-- ============================================================
+CREATE TABLE
+    IF NOT EXISTS `t_user_model_cost_record` (
+        `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Primary key',
+        `record_no` VARCHAR(64) NOT NULL COMMENT 'Business record number, unique, used for idempotency and reconciliation',
+        `user_id` BIGINT UNSIGNED NOT NULL COMMENT 'C-side user id (t_user_info.id)',
+        `tenant_id` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Tenant id, 0 = personal / no tenant',
+        `vendor_id` BIGINT UNSIGNED NOT NULL COMMENT 'Vendor id (system vendor catalog)',
+        `model_id` BIGINT UNSIGNED NOT NULL COMMENT 'Model id (system model catalog)',
+        `modality` VARCHAR(16) NOT NULL DEFAULT 'chat' COMMENT 'Model kind snapshot: chat / image / video / audio',
+        `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'Status: 0-disabled 1-enabled',
+        `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT 'Soft delete: 0-no 1-yes',
+        `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Cost record time',
+        `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `uk_record_no` (`record_no`),
+        KEY `idx_user_time` (`user_id`, `create_time`),
+        KEY `idx_tenant_time` (`tenant_id`, `create_time`),
+        KEY `idx_vendor_id` (`vendor_id`),
+        KEY `idx_model_id` (`model_id`),
+        KEY `idx_modality_time` (`modality`, `create_time`),
+        KEY `idx_status` (`status`),
+        KEY `idx_is_deleted` (`is_deleted`),
+        KEY `idx_create_time` (`create_time`)
+    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'User model cost record table (one row per billable call)';
+
+-- ------------------------------------------------------------
+-- User model cost records
+-- Sample rows only; real records are written at runtime.
+-- ------------------------------------------------------------
+INSERT INTO
+    `t_user_model_cost_record` (`id`, `record_no`, `user_id`, `tenant_id`, `vendor_id`, `model_id`, `modality`, `status`, `is_deleted`)
+VALUES
+    (1, 'COST-20250101-000001', 1, 0, 1, 1, 'chat', 1, 0),
+    (2, 'COST-20250101-000002', 1, 0, 23, 15, 'video', 1, 0),
+    (3, 'COST-20250101-000003', 1, 0, 34, 29, 'image', 1, 0),
+    (4, 'COST-20250101-000004', 1, 0, 40, 35, 'audio', 1, 0) ON DUPLICATE KEY
+UPDATE `record_no` =
+VALUES
+    (`record_no`);
